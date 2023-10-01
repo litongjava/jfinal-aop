@@ -70,23 +70,31 @@ package com.litongjava.jfinal.aop;
  *    违反上述配置的情况下使用 Singleton 注解来覆盖默认配置，这样可以节省大量代码
  */
 public class Aop {
-	
-	static AopFactory aopFactory = new AopFactory();
-	
-	public static <T> T get(Class<T> targetClass) {
-		return aopFactory.get(targetClass);
-	}
-	
-	public static <T> T inject(T targetObject) {
-		return aopFactory.inject(targetObject);
-	}
-	
-	/* 通过 AopManager.me().getAopFactory().inject(...) 可调用如下方法，不直接开放出来
-	public static <T> T inject(Class<T> targetClass, T targetObject) {
-		return aopFactory.inject(targetClass, targetObject);
-	}*/
+
+  static AopFactory aopFactory = new AopFactory();
+
+  public static <T> T get(Class<T> targetClass) {
+    return aopFactory.get(targetClass);
+  }
+
+  public static <T> T inject(T targetObject) {
+    return aopFactory.inject(targetObject);
+  }
+
+  /*
+   * 通过 AopManager.me().getAopFactory().inject(...) 可调用如下方法，不直接开放出来 public static <T> T inject(Class<T> targetClass, T targetObject) { return aopFactory.inject(targetClass, targetObject); }
+   */
+
+  /**
+   * 添加到IOC容器中
+   * @param returnType
+   * @param bean
+   */
+  public static void register(Class<?> type, Object value) {
+    aopFactory.register(type, value);
+  }
+
+  public static String[] beans() {
+    return aopFactory.beans();
+  }
 }
-
-
-
-

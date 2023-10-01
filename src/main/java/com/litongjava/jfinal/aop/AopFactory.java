@@ -2,6 +2,7 @@ package com.litongjava.jfinal.aop;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.litongjava.jfinal.proxy.Proxy;
@@ -12,7 +13,7 @@ import com.litongjava.jfinal.proxy.Proxy;
 public class AopFactory {
 
   // 单例缓存
-  protected ConcurrentHashMap<Class<?>, Object> singletonCache = new ConcurrentHashMap<Class<?>, Object>();
+  protected Map<Class<?>, Object> singletonCache = new ConcurrentHashMap<Class<?>, Object>();
 
   // 支持循环注入
   protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = ThreadLocal.withInitial(() -> new HashMap<>());
@@ -265,5 +266,25 @@ public class AopFactory {
     } else {
       return from;
     }
+  }
+
+  /**
+   * 注册的Bean容器
+   * @param targetClass
+   * @param value
+   */
+  public void register(Class<?> targetClass, Object value) {
+    HashMap<Class<?>, Object> map = singletonTl.get();
+    map.put(targetClass, value);
+    try {
+      doInject(targetClass, value);
+    } catch (ReflectiveOperationException e) {
+      e.printStackTrace();
+    }
+    singletonCache.put(targetClass, value);
+  }
+
+  public String[] beans() {
+    return singletonCache.values().stream().map(Object::toString).toArray(String[]::new);
   }
 }
