@@ -87,10 +87,10 @@ public class Aop {
 
   /**
    * 添加到IOC容器中
-   * @param returnType
-   * @param bean
+   * @param type
+   * @param value
    */
-  public static void register(Class<?> type, Object value) {
+  public static void put(Class<?> type, Object value) {
     aopFactory.register(type, value);
   }
 
