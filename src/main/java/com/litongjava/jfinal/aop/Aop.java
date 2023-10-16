@@ -97,4 +97,8 @@ public class Aop {
   public static String[] beans() {
     return aopFactory.beans();
   }
+  
+  public static void close() {
+    aopFactory.clean();
+  }
 }

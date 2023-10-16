@@ -287,4 +287,16 @@ public class AopFactory {
   public String[] beans() {
     return singletonCache.values().stream().map(Object::toString).toArray(String[]::new);
   }
+
+  public void clean() {
+    // 单例缓存
+    singletonCache = new ConcurrentHashMap<Class<?>, Object>();
+
+    // 支持循环注入
+    singletonTl = ThreadLocal.withInitial(() -> new HashMap<>());
+    prototypeTl = ThreadLocal.withInitial(() -> new HashMap<>());
+
+    // 父类到子类、接口到实现类之间的映射关系
+    mapping = null;
+  }
 }
