@@ -1,5 +1,12 @@
 package com.litongjava.jfinal.aop;
 
+import com.litongjava.jfinal.aop.annotation.Component;
+import com.litongjava.jfinal.aop.annotation.Configuration;
+import com.litongjava.jfinal.aop.annotation.Controller;
+import com.litongjava.jfinal.aop.annotation.HttpRequest;
+import com.litongjava.jfinal.aop.annotation.Repository;
+import com.litongjava.jfinal.aop.annotation.Service;
+
 /**
  * Aop 支持在任意时空便捷使用 Aop
  * 
@@ -97,8 +104,22 @@ public class Aop {
   public static String[] beans() {
     return aopFactory.beans();
   }
-  
+
   public static void close() {
     aopFactory.clean();
+  }
+
+  public static boolean isComponent(Class<?> clazz) {
+    return clazz.isAnnotationPresent(Component.class)
+        //
+        || clazz.isAnnotationPresent(Controller.class)
+        //
+        || clazz.isAnnotationPresent(Service.class)
+        //
+        || clazz.isAnnotationPresent(Repository.class)
+        //
+        || clazz.isAnnotationPresent(Configuration.class)
+        //
+        || clazz.isAnnotationPresent(HttpRequest.class);
   }
 }
