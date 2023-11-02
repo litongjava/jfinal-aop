@@ -284,6 +284,28 @@ public class AopFactory {
     singletonCache.put(targetClass, value);
   }
 
+  /**
+   * get from singletonCache
+   * @param type
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T getOnly(Class<T> type) {
+    Class<?> usefulClass = getUsefulClass(type);
+    Class<?> mappingClass = getMappingClass(usefulClass);
+    Object object = singletonCache.get(mappingClass);
+    if (object != null) {
+      return (T) object;
+    }
+    return null;
+  }
+
+  public boolean contains(Class<?> type) {
+    type = getUsefulClass(type);
+    Class<?> mappingClass = getMappingClass(type);
+    return singletonCache.containsKey(mappingClass);
+  }
+
   public String[] beans() {
     return singletonCache.values().stream().map(Object::toString).toArray(String[]::new);
   }
