@@ -16,8 +16,22 @@ public class AopFactory {
   protected Map<Class<?>, Object> singletonCache = new ConcurrentHashMap<Class<?>, Object>();
 
   // 支持循环注入
-  protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = ThreadLocal.withInitial(() -> new HashMap<>());
-  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = ThreadLocal.withInitial(() -> new HashMap<>());
+  // protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = ThreadLocal.withInitial(() -> new HashMap<>());
+  protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = new ThreadLocal<HashMap<Class<?>, Object>>() {
+    @Override
+    protected HashMap<Class<?>, Object> initialValue() {
+      return new HashMap<>();
+    }
+  };
+
+//  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = ThreadLocal.withInitial(() -> new HashMap<>());
+  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = new ThreadLocal<HashMap<Class<?>, Object>>() {
+    @Override
+    protected HashMap<Class<?>, Object> initialValue() {
+        return new HashMap<>();
+    }
+};
+
 
   // 父类到子类、接口到实现类之间的映射关系
   protected HashMap<Class<?>, Class<?>> mapping = null;
