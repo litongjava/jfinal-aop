@@ -1,11 +1,14 @@
 package com.litongjava.jfinal.aop;
 
+import java.util.List;
+
 import com.litongjava.jfinal.aop.annotation.Component;
 import com.litongjava.jfinal.aop.annotation.Configuration;
 import com.litongjava.jfinal.aop.annotation.Controller;
 import com.litongjava.jfinal.aop.annotation.HttpRequest;
 import com.litongjava.jfinal.aop.annotation.Repository;
 import com.litongjava.jfinal.aop.annotation.Service;
+import com.litongjava.jfinal.model.DestroyableBean;
 
 /**
  * Aop 支持在任意时空便捷使用 Aop
@@ -109,6 +112,11 @@ public class Aop {
     aopFactory.clean();
   }
 
+
+  public static void addDestroyableBeans(List<DestroyableBean> destroyableBeans) {
+    aopFactory.addDestroyableBeans(destroyableBeans);
+  }
+  
   public static boolean isComponent(Class<?> clazz) {
     return clazz.isAnnotationPresent(Component.class)
         //
@@ -118,8 +126,10 @@ public class Aop {
         //
         || clazz.isAnnotationPresent(Repository.class)
         //
-        || clazz.isAnnotationPresent(Configuration.class)
-        //
         || clazz.isAnnotationPresent(HttpRequest.class);
+  }
+
+  public static boolean isConfiguration(Class<?> clazz) {
+    return clazz.isAnnotationPresent(Configuration.class);
   }
 }

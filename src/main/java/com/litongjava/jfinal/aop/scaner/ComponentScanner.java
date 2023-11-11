@@ -11,8 +11,11 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.litongjava.jfinal.aop.annotation.ComponentScan;
+import com.litongjava.jfinal.aop.process.BeanProcess;
 
 public class ComponentScanner {
+
+  private static BeanProcess beanProcess = new BeanProcess();
 
   public static List<Class<?>> scan(Class<?>... primarySources) throws Exception {
     List<Class<?>> classes = new ArrayList<>();
@@ -76,4 +79,7 @@ public class ComponentScanner {
     return classes;
   }
 
+  public static void initAnnotation(List<Class<?>> scannedClasses) {
+    beanProcess.initAnnotation(scannedClasses);
+  }
 }

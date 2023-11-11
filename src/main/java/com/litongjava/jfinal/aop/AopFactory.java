@@ -1,10 +1,14 @@
 package com.litongjava.jfinal.aop;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.proxy.Proxy;
 
 /**
@@ -17,21 +21,10 @@ public class AopFactory {
 
   // 支持循环注入
   // protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = ThreadLocal.withInitial(() -> new HashMap<>());
-  protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = new ThreadLocal<HashMap<Class<?>, Object>>() {
-    @Override
-    protected HashMap<Class<?>, Object> initialValue() {
-      return new HashMap<>();
-    }
-  };
+  protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = initThreadLocalHashMap();
 
 //  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = ThreadLocal.withInitial(() -> new HashMap<>());
-  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = new ThreadLocal<HashMap<Class<?>, Object>>() {
-    @Override
-    protected HashMap<Class<?>, Object> initialValue() {
-        return new HashMap<>();
-    }
-};
-
+  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = initThreadLocalHashMap();
 
   // 父类到子类、接口到实现类之间的映射关系
   protected HashMap<Class<?>, Class<?>> mapping = null;
@@ -39,6 +32,17 @@ public class AopFactory {
   protected boolean singleton = true; // 默认单例
 
   protected boolean injectSuperClass = false; // 默认不对超类进行注入
+
+  protected List<DestroyableBean> destroyableBeans = new ArrayList<>();
+
+  public ThreadLocal<HashMap<Class<?>, Object>> initThreadLocalHashMap() {
+    return new ThreadLocal<HashMap<Class<?>, Object>>() {
+      @Override
+      protected HashMap<Class<?>, Object> initialValue() {
+        return new HashMap<>();
+      }
+    };
+  }
 
   public <T> T get(Class<T> targetClass) {
     try {
@@ -329,10 +333,22 @@ public class AopFactory {
     singletonCache = new ConcurrentHashMap<Class<?>, Object>();
 
     // 支持循环注入
-    singletonTl = ThreadLocal.withInitial(() -> new HashMap<>());
-    prototypeTl = ThreadLocal.withInitial(() -> new HashMap<>());
+    singletonTl = initThreadLocalHashMap();
+    prototypeTl = initThreadLocalHashMap();
 
     // 父类到子类、接口到实现类之间的映射关系
     mapping = null;
+    // 关闭类
+    for (DestroyableBean bean : destroyableBeans) {
+      try {
+        bean.getDestroyMethod().invoke(bean.getBean());
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  public void addDestroyableBeans(List<DestroyableBean> destroyableBeans) {
+    this.destroyableBeans.addAll(destroyableBeans);
   }
 }

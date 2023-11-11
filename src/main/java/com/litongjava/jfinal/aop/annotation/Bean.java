@@ -16,5 +16,11 @@ public @interface Bean {
   String destroyMethod() default "";
 
   String initMethod() default "";
+  
+  /**
+   * Startup priority, the smaller the value, the higher the startup priority
+   * @return
+   */
+  int priority() default 100;
 
 }
