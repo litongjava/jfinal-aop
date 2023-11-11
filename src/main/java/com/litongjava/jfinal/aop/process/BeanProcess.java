@@ -17,6 +17,9 @@ import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.model.MultiReturn;
 import com.litongjava.jfinal.model.Pair;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class BeanProcess {
   // 创建一个队列来存储 process 方法的返回值
   private Queue<Class<?>> componentClass = new LinkedList<>();
@@ -33,10 +36,18 @@ public class BeanProcess {
         Method initMethod = bean.getClass().getMethod(beanAnnotation.initMethod());
         initMethod.invoke(bean);
       }
+      Class<? extends Object> readBeanClass = bean.getClass();
+      String beanClassName = readBeanClass.getName();
+      log.info("init bean:{}", beanClassName);
 
       Class<?> returnType = method.getReturnType();
       // 将bean添加到容器中，或进行其他操作,
-      AopManager.me().addSingletonObject(returnType, bean);
+      if (!returnType.getName().equals(readBeanClass.getName())) {
+        AopManager.me().addMapping(returnType, readBeanClass);
+        log.info("add bean mapping:{} from {}", returnType, beanClassName);
+      }
+      AopManager.me().addSingletonObject(bean);
+
       // 为单例注入依赖以后，再添加为单例供后续使用
       Aop.inject(bean);
 
@@ -66,7 +77,7 @@ public class BeanProcess {
     Queue<Object> beans = processConfiguration.getR1();
     List<DestroyableBean> destroyableBeans = processConfiguration.getR2();
     Aop.addDestroyableBeans(destroyableBeans);
-    
+
     this.processAutowired(beans);
 
     // 处理componment注解
@@ -102,7 +113,7 @@ public class BeanProcess {
 
         try {
           // 尝试找到销毁方法
-          Method destroyMethod = beanMethod.getValue().getMethod(beanAnnotation.destroyMethod());
+          Method destroyMethod = beanInstance.getClass().getMethod(beanAnnotation.destroyMethod());
           destroyableBeans.add(new DestroyableBean(beanInstance, destroyMethod));
         } catch (NoSuchMethodException e) {
           e.printStackTrace();

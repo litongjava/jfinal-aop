@@ -242,7 +242,7 @@ public class AopFactory {
     return addSingletonObject(type, singletonObject);
   }
 
-  public synchronized <T> AopFactory addMapping(Class<T> from, Class<? extends T> to) {
+  public synchronized <T> AopFactory addMapping(Class<? extends T> from, Class<? extends T> to) {
     if (from == null || to == null) {
       throw new IllegalArgumentException("The parameter from and to can not be null");
     }

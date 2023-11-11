@@ -142,9 +142,10 @@ public class AopManager {
 	 * @param from 父类或者接口
 	 * @param to 父类的子类或者接口的实现类
 	 */
-	public <T> void addMapping(Class<T> from, Class<? extends T> to) {
-		Aop.aopFactory.addMapping(from, to);
+	public <T> void addMapping(Class<? extends T> from, Class<? extends T> to) {
+    Aop.aopFactory.addMapping(from, to);
 	}
+
 	
 	/**
 	 * 功能与 addMapping(Class<T> from, Class<? extends T> to) 相同，仅仅是第二个参数
@@ -188,4 +189,6 @@ public class AopManager {
 	public boolean isSingleton() {
 		return Aop.aopFactory.isSingleton();
 	}
+
+  
 }
