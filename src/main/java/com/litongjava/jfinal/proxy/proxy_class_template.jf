@@ -2,7 +2,7 @@
 生成的源代码格式如下：
 
 package com.xxx;
-import com.jfinal.aop.Invocation;
+import com.litongjava.jfinal.aop.Invocation;
 
 public class Target$$EnhancerByJFinal extends Target {
 	public String test(String p0, int p1) {
@@ -23,7 +23,7 @@ public class Target$$EnhancerByJFinal extends Target {
 --#
 
 package #(pkg);
-import com.jfinal.aop.Invocation;
+import com.litongjava.jfinal.aop.Invocation;
 public class #(name)#(classTypeVars) extends #(targetName)#(targetTypeVars) {
 #for(x : methodList)
 	

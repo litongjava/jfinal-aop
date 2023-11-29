@@ -1,10 +1,10 @@
 /**
  * Copyright (c) 2011-2023, James Zhan 詹波 (jfinal@126.com).
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
@@ -21,28 +21,34 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jfinal.template.Engine;
+import com.jfinal.template.Template;
 import com.litongjava.jfinal.aop.Before;
 import com.litongjava.jfinal.aop.Clear;
 import com.litongjava.jfinal.aop.InterceptorManager;
 import com.litongjava.jfinal.kit.Kv;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ProxyGenerator 用于生成代理类的源代码
- * 
+ *
  * 注意：业务层全局拦截器要在 ProxyGenerator 工作之前配置好，否则无法参与生成
- * 
+ *
  * 追求性能极致：
  * 1：禁止使用 JDK 的 Method.invoke(...) 调用被代理方法
  * 2：method 存在有效的拦截器才生成代理方法 ProxyMethod
  * 3：目标类 target 存在 ProxyMethod 才生成代理类 ProxyClass
- * 
+ *
  * 避免生成代理类的方法：
  * 1：类文件内部删掉 @Before 声明的拦截器
  * 2：添加一个 class 层的 @Clear 注解
  * 因此，proxy 模块设计可以覆盖掉 @Enhance 注解功能
  */
-//@Slf4j
+@Slf4j
 public class ProxyGenerator {
+
+  protected Engine engine = new Engine("forProxy").setToClassPathSourceFactory();
+  protected Template template = engine.getTemplate("com/litongjava/jfinal/proxy/proxy_class_template.jf");
 
   protected boolean printGeneratedClassToConsole = false;
   protected boolean printGeneratedClassToLog = true;
@@ -124,20 +130,20 @@ public class ProxyGenerator {
       proxyMethod.setMethod(m);
     }
 
-//    if (proxyClass.needProxy()) {
-//      String sourceCode = template.renderToString(clazz);
-//      proxyClass.setSourceCode(sourceCode);
-//
-//      if (printGeneratedClassToConsole) {
-//        String msg = "Generate proxy class \"" + proxyClass.getPkg() + "." + proxyClass.getName() + "\":";
-//        System.out.print(msg);
-//        System.out.println(sourceCode);
-//      }
-//      if (printGeneratedClassToLog && log.isDebugEnabled()) {
-//        String msg = "\nGenerate proxy class \"" + proxyClass.getPkg() + "." + proxyClass.getName() + "\":";
-//        log.debug(msg + sourceCode);
-//      }
-//    }
+    if (proxyClass.needProxy()) {
+      String sourceCode = template.renderToString(clazz);
+      proxyClass.setSourceCode(sourceCode);
+
+      if (printGeneratedClassToConsole) {
+        String msg = "Generate proxy class \"" + proxyClass.getPkg() + "." + proxyClass.getName() + "\":";
+        System.out.print(msg);
+        System.out.println(sourceCode);
+      }
+      if (printGeneratedClassToLog && log.isDebugEnabled()) {
+        String msg = "\nGenerate proxy class \"" + proxyClass.getPkg() + "." + proxyClass.getName() + "\":";
+        log.debug(msg + sourceCode);
+      }
+    }
 
     return proxyClass;
   }
@@ -213,7 +219,7 @@ public class ProxyGenerator {
 
   /**
    * 获取父类泛型变量
-   * 
+   *
    * 相对于 getTypeVars(...) 取消了 TypeVariable.getBounds() 内容的生成，否则编译错误
    */
   @SuppressWarnings("rawtypes")
@@ -315,7 +321,7 @@ public class ProxyGenerator {
       return;
     }
 
-    for (Iterator<Class<?>> it = target.iterator(); it.hasNext();) {
+    for (Iterator<Class<?>> it = target.iterator(); it.hasNext(); ) {
       Class<?> interClass = it.next();
       for (Class<?> c : clearInters) {
         if (c == interClass) {
@@ -375,8 +381,8 @@ public class ProxyGenerator {
   }
 
   /**
-     * 配置打印生成类到日志
-     */
+   * 配置打印生成类到日志
+   */
   public void setPrintGeneratedClassToLog(boolean printGeneratedClassToLog) {
     this.printGeneratedClassToLog = printGeneratedClassToLog;
   }
