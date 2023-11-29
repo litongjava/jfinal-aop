@@ -80,6 +80,16 @@
     </repository>
   </distributionManagement>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <!-- **/* 前缀用法，可以匹配所有路径 -->
+          <include>**/*.jf</include>
+        </includes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
     <plugins>
       <!-- Source -->
       <plugin>
