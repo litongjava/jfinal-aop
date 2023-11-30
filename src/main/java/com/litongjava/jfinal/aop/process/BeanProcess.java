@@ -66,6 +66,7 @@ public class BeanProcess {
     for (Class<?> clazz : scannedClasses) {
       if (clazz.isAnnotationPresent(Configuration.class)) {
         configurationClass.add(clazz);
+        break;
       }
       if (Aop.isComponent(clazz)) {
         componentClass.add(clazz);
