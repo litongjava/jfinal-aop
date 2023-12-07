@@ -6,7 +6,7 @@
 <dependency>
   <groupId>com.litongjava</groupId>
   <artifactId>jfinal-aop</artifactId>
-  <version>1.0.8</version>
+  <version>1.0.9</version>
 </dependency>
 ```
 
