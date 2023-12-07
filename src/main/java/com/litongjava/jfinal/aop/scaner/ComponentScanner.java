@@ -40,7 +40,8 @@ public class ComponentScanner {
   private static List<Class<?>> findClasses(String basePackage) throws Exception {
     List<Class<?>> classes = new ArrayList<>();
     String path = basePackage.replace('.', '/');
-    URL resource = Thread.currentThread().getContextClassLoader().getResource(path);
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    URL resource = contextClassLoader.getResource(path);
 
     if (resource == null) {
       throw new IllegalArgumentException("No directory found for package " + basePackage);
@@ -57,7 +58,8 @@ public class ComponentScanner {
         String entryName = entry.getName();
         if (entryName.startsWith(path) && entryName.endsWith(".class")) {
           String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
-          classes.add(Class.forName(className));
+          Class<?> clazz = contextClassLoader.loadClass(className);
+          classes.add(clazz);
         }
       }
     } else {
@@ -68,7 +70,8 @@ public class ComponentScanner {
           classes.addAll(findClasses(basePackage + "." + file.getName()));
         } else if (file.getName().endsWith(".class")) {
           String className = basePackage + '.' + file.getName().substring(0, file.getName().length() - 6);
-          classes.add(Class.forName(className));
+          Class<?> clazz = contextClassLoader.loadClass(className);
+          classes.add(clazz);
         }
       }
     }
