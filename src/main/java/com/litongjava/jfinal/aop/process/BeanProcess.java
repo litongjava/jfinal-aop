@@ -38,7 +38,7 @@ public class BeanProcess {
       }
       Class<? extends Object> readBeanClass = bean.getClass();
       String beanClassName = readBeanClass.getName();
-      log.info("init bean:{}", beanClassName);
+      log.info("inited bean:{}", beanClassName);
 
       Class<?> returnType = method.getReturnType();
       // 将bean添加到容器中，或进行其他操作,
@@ -62,11 +62,16 @@ public class BeanProcess {
     if (scannedClasses == null) {
       return;
     }
+    //for(int i=0;i<scannedClasses.size();i++) {
+    //  log.info("{}",scannedClasses.get(i).toString());
+    //}
     // 1. 分类为 Configuration类和其他类,先处理Configuration类
     for (Class<?> clazz : scannedClasses) {
-      if (clazz.isAnnotationPresent(Configuration.class)) {
+      boolean annotationPresent = clazz.isAnnotationPresent(Configuration.class);
+      //log.info("{},{}",clazz.toString(),annotationPresent);
+      if (annotationPresent) {
         configurationClass.add(clazz);
-        break;
+        continue;
       }
       if (Aop.isComponent(clazz)) {
         componentClass.add(clazz);
