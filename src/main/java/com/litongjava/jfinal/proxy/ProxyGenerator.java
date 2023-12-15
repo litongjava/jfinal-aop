@@ -15,6 +15,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import com.litongjava.jfinal.aop.Before;
 import com.litongjava.jfinal.aop.Clear;
 import com.litongjava.jfinal.aop.InterceptorManager;
 import com.litongjava.jfinal.kit.Kv;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -47,11 +49,50 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProxyGenerator {
 
-  protected Engine engine = new Engine("forProxy").setToClassPathSourceFactory();
-  protected Template template = engine.getTemplate("com/litongjava/jfinal/proxy/proxy_class_template.jf");
+  protected Engine engine = null;
+  protected Template template = null;
 
   protected boolean printGeneratedClassToConsole = false;
   protected boolean printGeneratedClassToLog = true;
+
+  public ProxyGenerator() {
+    String filename = "com/litongjava/jfinal/proxy/proxy_class_template.jf";
+    String baseTemplatePath = engine.getEngineConfig().getBaseTemplatePath();
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+    String finalFileName = buildFinalFileName(baseTemplatePath, filename);
+    URL url = classLoader.getResource(finalFileName);
+    if (url != null) {
+      engine = new Engine("forProxy").setToClassPathSourceFactory();
+      template = engine.getTemplate(filename);
+    } else {
+      // 创建proxy_class_template.jf文件
+      engine = new Engine("forProxy").setSourceFactory(new com.jfinal.template.source.FileSourceFactory());
+      new ProxyClassTemplate("proxy_class_template.jf").create();
+      template = engine.getTemplate("proxy_class_template.jf");
+
+    }
+  }
+
+  public String buildFinalFileName(String baseTemplatePath, String fileName) {
+    String finalFileName;
+    if (baseTemplatePath != null) {
+      char firstChar = fileName.charAt(0);
+      if (firstChar == '/' || firstChar == '\\') {
+        finalFileName = baseTemplatePath + fileName;
+      } else {
+        finalFileName = baseTemplatePath + "/" + fileName;
+      }
+    } else {
+      finalFileName = fileName;
+    }
+
+    if (finalFileName.charAt(0) == '/') {
+      finalFileName = finalFileName.substring(1);
+    }
+
+    return finalFileName;
+  }
 
   public ProxyClass generate(Class<?> target) {
     ProxyClass proxyClass = new ProxyClass(target);
@@ -321,7 +362,7 @@ public class ProxyGenerator {
       return;
     }
 
-    for (Iterator<Class<?>> it = target.iterator(); it.hasNext(); ) {
+    for (Iterator<Class<?>> it = target.iterator(); it.hasNext();) {
       Class<?> interClass = it.next();
       for (Class<?> c : clearInters) {
         if (c == interClass) {
