@@ -57,13 +57,13 @@ public class ProxyGenerator {
 
   public ProxyGenerator() {
     String filename = "com/litongjava/jfinal/proxy/proxy_class_template.jf";
+    engine = new Engine("forProxy").setToClassPathSourceFactory();
     String baseTemplatePath = engine.getEngineConfig().getBaseTemplatePath();
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     String finalFileName = buildFinalFileName(baseTemplatePath, filename);
     URL url = classLoader.getResource(finalFileName);
     if (url != null) {
-      engine = new Engine("forProxy").setToClassPathSourceFactory();
       template = engine.getTemplate(filename);
     } else {
       // 创建proxy_class_template.jf文件
