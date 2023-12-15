@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
   <artifactId>jfinal-aop</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.0</version>
   <name>final-aop</name>
   <description>来自jfinal,基于jvm的原生aop框架.高效,简洁</description>
   <url>https://github.com/litongjava/final-aop</url>
