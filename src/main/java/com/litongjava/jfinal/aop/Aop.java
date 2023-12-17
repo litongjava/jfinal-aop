@@ -6,10 +6,11 @@ import java.util.Map;
 import com.litongjava.jfinal.aop.annotation.Component;
 import com.litongjava.jfinal.aop.annotation.Configuration;
 import com.litongjava.jfinal.aop.annotation.Controller;
-import com.litongjava.jfinal.aop.annotation.HttpRequest;
+import com.litongjava.jfinal.aop.annotation.HttpApi;
 import com.litongjava.jfinal.aop.annotation.Repository;
 import com.litongjava.jfinal.aop.annotation.Service;
 import com.litongjava.jfinal.aop.process.BeanProcess;
+import com.litongjava.jfinal.aop.process.BeforeStartConfigurationProcess;
 import com.litongjava.jfinal.aop.scaner.ComponentScanner;
 import com.litongjava.jfinal.model.DestroyableBean;
 
@@ -97,7 +98,7 @@ public class Aop {
    * @return
    */
   public static <T> T get(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> mapping) {
-    return aopFactory.getWithMapping(targetClass,mapping);
+    return aopFactory.getWithMapping(targetClass, mapping);
   }
 
   public static <T> T inject(T targetObject) {
@@ -138,7 +139,7 @@ public class Aop {
         //
         || clazz.isAnnotationPresent(Repository.class)
         //
-        || clazz.isAnnotationPresent(HttpRequest.class);
+        || clazz.isAnnotationPresent(HttpApi.class);
   }
 
   public static boolean isConfiguration(Class<?> clazz) {
@@ -150,8 +151,11 @@ public class Aop {
   }
 
   public static void initAnnotation(List<Class<?>> scannedClasses) {
-    BeanProcess beanProcess = new BeanProcess();
-    beanProcess.initAnnotation(scannedClasses);
+    new BeanProcess().initAnnotation(scannedClasses);
+  }
+
+  public static List<Class<?>> processBeforeStartConfiguration(List<Class<?>> scannedClasses) {
+    return new BeforeStartConfigurationProcess().process(scannedClasses);
   }
 
 }

@@ -97,11 +97,15 @@ public class AopFactory {
       try {
         ret = singletonCache.get(targetClass);
         if (ret == null) {
-          ret = createObject(targetClass, intrefaceClass);
-          map.put(targetClass, ret);
-          doInject(targetClass, ret);
-          singletonCache.put(targetClass, ret);
+          if (intrefaceClass != null) {
+            ret = createObject(targetClass, intrefaceClass);
+          } else {
+            ret = createObject(targetClass);
+          }
         }
+        map.put(targetClass, ret);
+        doInject(targetClass, ret);
+        singletonCache.put(targetClass, ret);
         return (T) ret;
       } finally {
         if (size == 0) { // 仅顶层才需要 remove()
