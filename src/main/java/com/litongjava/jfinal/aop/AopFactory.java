@@ -52,8 +52,16 @@ public class AopFactory {
     }
   }
 
+  public <T> T getWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping) {
+    try {
+      return doGetgetWithMapping(targetClass, interfaceMapping);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @SuppressWarnings("unchecked")
-  protected <T> T doGet(Class<T> targetClass) throws ReflectiveOperationException {
+  protected <T> T doGet(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
     // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
     // targetClass = (Class<T>)getUsefulClass(targetClass);
 
@@ -63,14 +71,14 @@ public class AopFactory {
     boolean singleton = (si != null ? si.value() : this.singleton);
 
     if (singleton) {
-      return doGetSingleton(targetClass);
+      return doGetSingleton(targetClass, intrefaceClass);
     } else {
-      return doGetPrototype(targetClass);
+      return doGetPrototype(targetClass, intrefaceClass);
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T doGetSingleton(Class<T> targetClass) throws ReflectiveOperationException {
+  protected <T> T doGetSingleton(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
     Object ret = singletonCache.get(targetClass);
     if (ret != null) {
       return (T) ret;
@@ -89,7 +97,7 @@ public class AopFactory {
       try {
         ret = singletonCache.get(targetClass);
         if (ret == null) {
-          ret = createObject(targetClass);
+          ret = createObject(targetClass, intrefaceClass);
           map.put(targetClass, ret);
           doInject(targetClass, ret);
           singletonCache.put(targetClass, ret);
@@ -103,8 +111,117 @@ public class AopFactory {
     }
   }
 
+  protected <T> T doGet(Class<T> targetClass) throws ReflectiveOperationException {
+    return doGet(targetClass, null);
+  }
+
   @SuppressWarnings("unchecked")
-  protected <T> T doGetPrototype(Class<T> targetClass) throws ReflectiveOperationException {
+  protected <T> T doGetgetWithMapping(Class<T> targetClass,
+      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+    // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
+    // targetClass = (Class<T>)getUsefulClass(targetClass);
+
+    targetClass = (Class<T>) getMappingClass(targetClass);
+
+    Singleton si = targetClass.getAnnotation(Singleton.class);
+    boolean singleton = (si != null ? si.value() : this.singleton);
+
+    if (singleton) {
+      return doGetSingletonWithMapping(targetClass, interfaceMapping);
+    } else {
+      return doGetPrototypeWithMapping(targetClass, interfaceMapping);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T> T doGetgetWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface,
+      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+    targetClass = (Class<T>) getMappingClass(targetClass);
+
+    Singleton si = targetClass.getAnnotation(Singleton.class);
+    boolean singleton = (si != null ? si.value() : this.singleton);
+
+    if (singleton) {
+      return doGetSingletonWithMapping(targetClass, typeMaybeInterface, interfaceMapping);
+    } else {
+      return doGetPrototypeWithMapping(targetClass, typeMaybeInterface, interfaceMapping);
+    }
+
+  }
+
+  protected <T> T doGetSingletonWithMapping(Class<T> targetClass,
+      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+    return doGetSingletonWithMapping(targetClass, null, interfaceMapping);
+  }
+
+  /**
+   * @param <T>
+   * @param targetClass 目标类
+   * @param typeMaybeInterface 目标类的接口或者抽象类 
+   * @param interfaceMapping 目标类内成员变量的 接口和实现类映射 
+   * @return
+   * @throws ReflectiveOperationException
+   */
+  @SuppressWarnings("unchecked")
+  protected <T> T doGetSingletonWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface,
+      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+    Object ret = singletonCache.get(targetClass);
+    if (ret != null) {
+      return (T) ret;
+    }
+
+    HashMap<Class<?>, Object> map = singletonTl.get();
+    int size = map.size();
+    if (size > 0) {
+      ret = map.get(targetClass);
+      if (ret != null) { // 发现循环注入
+        return (T) ret;
+      }
+    }
+
+    synchronized (this) {
+      try {
+        ret = singletonCache.get(targetClass);
+        if (ret == null) {
+          if (typeMaybeInterface == null) {
+            ret = createObject(targetClass);
+          } else {
+            ret = createObject(targetClass, typeMaybeInterface);
+          }
+
+          map.put(targetClass, ret);
+          doInjectWithMapping(targetClass, ret, interfaceMapping);
+          singletonCache.put(targetClass, ret);
+        }
+        return (T) ret;
+      } finally {
+        if (size == 0) { // 仅顶层才需要 remove()
+          singletonTl.remove();
+        }
+      }
+    }
+  }
+
+  protected <T> T doGetSingleton(Class<T> targetClass) throws ReflectiveOperationException {
+    return doGetSingletonWithMapping(targetClass, null);
+  }
+
+  protected <T> T doGetPrototypeWithMapping(Class<T> targetClass,
+      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+    return doGetPrototypeWithMapping(targetClass, null, interfaceMapping);
+  }
+
+  /**
+   * @param <T>
+   * @param targetClass 目标类
+   * @param typeMaybeInterface 目标类的接口或者抽象类 
+   * @param interfaceMapping 目标类内成员变量的 接口和实现类映射 
+   * @return
+   * @throws ReflectiveOperationException
+   */
+  @SuppressWarnings("unchecked")
+  protected <T> T doGetPrototypeWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface,
+      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     Object ret;
 
     HashMap<Class<?>, Object> map = prototypeTl.get();
@@ -113,12 +230,21 @@ public class AopFactory {
       ret = map.get(targetClass);
       if (ret != null) { // 发现循环注入
         // return (T)ret;
-        return (T) createObject(targetClass);
+        if (interfaceMapping != null) {
+          return (T) createObject(targetClass, typeMaybeInterface);
+        } else {
+          return (T) createObject(targetClass);
+        }
+
       }
     }
 
     try {
-      ret = createObject(targetClass);
+      if (interfaceMapping != null) {
+        ret = (T) createObject(targetClass, typeMaybeInterface);
+      } else {
+        ret = (T) createObject(targetClass);
+      }
       map.put(targetClass, ret);
       doInject(targetClass, ret);
       return (T) ret;
@@ -127,6 +253,36 @@ public class AopFactory {
         map.clear();
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T> T doGetPrototype(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
+    Object ret;
+
+    HashMap<Class<?>, Object> map = prototypeTl.get();
+    int size = map.size();
+    if (size > 0) {
+      ret = map.get(targetClass);
+      if (ret != null) { // 发现循环注入
+        // return (T)ret;
+        return (T) createObject(targetClass, intrefaceClass);
+      }
+    }
+
+    try {
+      ret = createObject(targetClass, intrefaceClass);
+      map.put(targetClass, ret);
+      doInject(targetClass, ret);
+      return (T) ret;
+    } finally {
+      if (size == 0) { // 仅顶层才需要 clear()
+        map.clear();
+      }
+    }
+  }
+
+  protected <T> T doGetPrototype(Class<T> targetClass) throws ReflectiveOperationException {
+    return doGetPrototypeWithMapping(targetClass, null);
   }
 
   public <T> T inject(T targetObject) {
@@ -148,11 +304,33 @@ public class AopFactory {
     }
   }
 
-  protected void doInject(Class<?> targetClass, Object targetObject) throws ReflectiveOperationException {
+  protected void doInjectWithMapping(Class<?> targetClass, Object targetObject,
+      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+
     targetClass = getUsefulClass(targetClass);
     Field[] fields = targetClass.getDeclaredFields();
     if (fields.length != 0) {
       for (Field field : fields) {
+        if (field.isAnnotationPresent(Autowired.class)) {
+          Class<?> typeMaybeInterface = field.getType();
+          Object fieldInjectedObject = null;
+          // 从interfaceMapping中查找实现类
+          if (interfaceMapping != null) {
+            Class<? extends Object> implClazz = interfaceMapping.get(typeMaybeInterface);
+            if (implClazz != null) {
+              fieldInjectedObject = doGetgetWithMapping(implClazz, typeMaybeInterface, interfaceMapping);
+              interfaceMapping.remove(typeMaybeInterface);
+            } else {
+              fieldInjectedObject = doGetgetWithMapping(typeMaybeInterface, interfaceMapping);
+            }
+
+          } else {
+            fieldInjectedObject = doGet(typeMaybeInterface);
+          }
+          field.setAccessible(true);
+          field.set(targetObject, fieldInjectedObject);
+        }
+
         Inject inject = field.getAnnotation(Inject.class);
         if (inject == null) {
           continue;
@@ -170,7 +348,50 @@ public class AopFactory {
     }
   }
 
+  protected void doInject(Class<?> targetClass, Object targetObject) throws ReflectiveOperationException {
+    targetClass = getUsefulClass(targetClass);
+    Field[] fields = targetClass.getDeclaredFields();
+    if (fields.length != 0) {
+      for (Field field : fields) {
+        if (field.isAnnotationPresent(Autowired.class)) {
+          Class<?> typeMaybeInterface = field.getType();
+          Object fieldInjectedObject = null;
+          // 从interfaceMapping中查找实现类
+          fieldInjectedObject = doGet(typeMaybeInterface);
+          field.setAccessible(true);
+          field.set(targetObject, fieldInjectedObject);
+        }
+
+        Inject inject = field.getAnnotation(Inject.class);
+        if (inject == null) {
+          continue;
+        }
+
+        Class<?> fieldInjectedClass = inject.value();
+        if (fieldInjectedClass == Void.class) {
+          fieldInjectedClass = field.getType();
+        }
+
+        Object fieldInjectedObject = doGet(fieldInjectedClass);
+        field.setAccessible(true);
+        field.set(targetObject, fieldInjectedObject);
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   protected Object createObject(Class<?> targetClass) throws ReflectiveOperationException {
+    Class<?>[] interfaces = targetClass.getInterfaces();
+    if (interfaces.length > 0) {
+      addMapping((Class<Object>) interfaces[0], (Class<? extends Object>) targetClass);
+    }
+    return Proxy.get(targetClass);
+  }
+
+  protected Object createObject(Class<?> targetClass, Class<?> intrefaceClass) {
+    if (intrefaceClass != null) {
+      addMapping(intrefaceClass, targetClass);
+    }
     return Proxy.get(targetClass);
   }
 
@@ -277,6 +498,7 @@ public class AopFactory {
    * @param from 父类或者接口 
    * @return 如果映射存在则返回映射值，否则返回参数 from 的值
    */
+  @SuppressWarnings("unchecked")
   public Class<?> getMappingClass(Class<?> from) {
     if (mapping != null) {
       Class<?> ret = mapping.get(from);
@@ -351,4 +573,5 @@ public class AopFactory {
   public void addDestroyableBeans(List<DestroyableBean> destroyableBeans) {
     this.destroyableBeans.addAll(destroyableBeans);
   }
+
 }

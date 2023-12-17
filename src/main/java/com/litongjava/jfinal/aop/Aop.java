@@ -1,6 +1,7 @@
 package com.litongjava.jfinal.aop;
 
 import java.util.List;
+import java.util.Map;
 
 import com.litongjava.jfinal.aop.annotation.Component;
 import com.litongjava.jfinal.aop.annotation.Configuration;
@@ -8,6 +9,8 @@ import com.litongjava.jfinal.aop.annotation.Controller;
 import com.litongjava.jfinal.aop.annotation.HttpRequest;
 import com.litongjava.jfinal.aop.annotation.Repository;
 import com.litongjava.jfinal.aop.annotation.Service;
+import com.litongjava.jfinal.aop.process.BeanProcess;
+import com.litongjava.jfinal.aop.scaner.ComponentScanner;
 import com.litongjava.jfinal.model.DestroyableBean;
 
 /**
@@ -87,6 +90,16 @@ public class Aop {
     return aopFactory.get(targetClass);
   }
 
+  /**
+   * 如果需要被注入的成员是一个接口类,从mapping中查找实现类,找到之后实例化实现类并将这个元素从mapping中移除
+   * @param clazz
+   * @param mapping
+   * @return
+   */
+  public static <T> T get(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> mapping) {
+    return aopFactory.getWithMapping(targetClass,mapping);
+  }
+
   public static <T> T inject(T targetObject) {
     return aopFactory.inject(targetObject);
   }
@@ -112,11 +125,10 @@ public class Aop {
     aopFactory.clean();
   }
 
-
   public static void addDestroyableBeans(List<DestroyableBean> destroyableBeans) {
     aopFactory.addDestroyableBeans(destroyableBeans);
   }
-  
+
   public static boolean isComponent(Class<?> clazz) {
     return clazz.isAnnotationPresent(Component.class)
         //
@@ -132,4 +144,14 @@ public class Aop {
   public static boolean isConfiguration(Class<?> clazz) {
     return clazz.isAnnotationPresent(Configuration.class);
   }
+
+  public static List<Class<?>> scan(Class<?>... primarySources) throws Exception {
+    return ComponentScanner.scan(primarySources);
+  }
+
+  public static void initAnnotation(List<Class<?>> scannedClasses) {
+    BeanProcess beanProcess = new BeanProcess();
+    beanProcess.initAnnotation(scannedClasses);
+  }
+
 }
