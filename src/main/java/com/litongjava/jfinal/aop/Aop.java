@@ -1,16 +1,13 @@
 package com.litongjava.jfinal.aop;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
-import com.litongjava.jfinal.aop.annotation.Component;
 import com.litongjava.jfinal.aop.annotation.Configuration;
-import com.litongjava.jfinal.aop.annotation.Controller;
-import com.litongjava.jfinal.aop.annotation.HttpApi;
-import com.litongjava.jfinal.aop.annotation.Repository;
-import com.litongjava.jfinal.aop.annotation.Service;
 import com.litongjava.jfinal.aop.process.BeanProcess;
 import com.litongjava.jfinal.aop.process.BeforeStartConfigurationProcess;
+import com.litongjava.jfinal.aop.process.ComponentAnnotation;
 import com.litongjava.jfinal.aop.scaner.ComponentScanner;
 import com.litongjava.jfinal.model.DestroyableBean;
 
@@ -131,15 +128,11 @@ public class Aop {
   }
 
   public static boolean isComponent(Class<?> clazz) {
-    return clazz.isAnnotationPresent(Component.class)
-        //
-        || clazz.isAnnotationPresent(Controller.class)
-        //
-        || clazz.isAnnotationPresent(Service.class)
-        //
-        || clazz.isAnnotationPresent(Repository.class)
-        //
-        || clazz.isAnnotationPresent(HttpApi.class);
+    return ComponentAnnotation.isComponent(clazz);
+  }
+  
+  public static Class<?> addComponentAnnotation(Class<? extends Annotation> clazz) {
+    return ComponentAnnotation.addComponentAnnotation(clazz);
   }
 
   public static boolean isConfiguration(Class<?> clazz) {
