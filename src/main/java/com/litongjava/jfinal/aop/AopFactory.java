@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.proxy.Proxy;
+import com.litongjava.jfinal.proxy.ProxyMethodCache;
 
 /**
  * AopFactory 是工具类 Aop 功能的具体实现，详细用法见 Aop
@@ -557,10 +558,13 @@ public class AopFactory {
   public void clean() {
     // 单例缓存
     singletonCache = new ConcurrentHashMap<Class<?>, Object>();
-
+    Proxy.clean();
+    ProxyMethodCache.clean();
+    
     // 支持循环注入
     singletonTl = initThreadLocalHashMap();
     prototypeTl = initThreadLocalHashMap();
+    
 
     // 父类到子类、接口到实现类之间的映射关系
     mapping = null;

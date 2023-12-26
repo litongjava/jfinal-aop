@@ -30,6 +30,9 @@ public class ConfigurationAnnotaionProcess {
    */
   public MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(
       Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
+    if (configurationClass == null || configurationClass.size() < 1) {
+      return null;
+    }
     // 用于存储Bean方法及其类的信息
     List<Pair<Method, Class<?>>> beanMethods = new ArrayList<>();
     List<Pair<Method, Class<?>>> initializationMethods = new ArrayList<>();
@@ -46,7 +49,7 @@ public class ConfigurationAnnotaionProcess {
 
     // 2. 按照priority对beanMethods排序
     beanMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(Bean.class).priority()));
-    initializationMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(Bean.class).priority()));
+    initializationMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(Initialization.class).priority()));
     Queue<Object> beans = new LinkedList<>();
     List<DestroyableBean> destroyableBeans = new ArrayList<>();
     // 3. 初始化beans
@@ -77,7 +80,7 @@ public class ConfigurationAnnotaionProcess {
     return new MultiReturn<Queue<Object>, List<DestroyableBean>, Void>(true, beans, destroyableBeans);
 
   }
-  
+
   /**
    * 处理有@Bean注解的方法
    * @param clazz
@@ -118,7 +121,7 @@ public class ConfigurationAnnotaionProcess {
     }
     return null;
   }
-  
+
   public void processConfigInitialization(Class<?> clazz, Method method,
       Map<Class<Object>, Class<? extends Object>> mapping) {
     // 调用 @Bean 方法

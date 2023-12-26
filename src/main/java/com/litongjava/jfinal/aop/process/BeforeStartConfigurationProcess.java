@@ -35,6 +35,8 @@ public class BeforeStartConfigurationProcess {
         continue;
       }
       annotationPresent = clazz.isAnnotationPresent(Configuration.class);
+      Configuration annotation = clazz.getAnnotation(Configuration.class);
+        
       // log.info("{},{}",clazz.toString(),annotationPresent);
       if (annotationPresent) {
         aopClass.add(clazz);
@@ -52,7 +54,9 @@ public class BeforeStartConfigurationProcess {
     MultiReturn<Queue<Object>, List<DestroyableBean>, Void> result = new ConfigurationAnnotaionProcess()
         .processConfiguration(beforeStartConfigurationClass, mapping);
     // 获取第二个返回结果
-    Aop.addDestroyableBeans(result.getR2());
+    if (result != null) {
+      Aop.addDestroyableBeans(result.getR2());
+    }
 
     return aopClass;
   }

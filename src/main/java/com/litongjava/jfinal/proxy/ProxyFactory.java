@@ -118,5 +118,10 @@ public class ProxyFactory {
 	public ProxyClassLoader getProxyClassLoader() {
 		return proxyClassLoader;
 	}
+
+  public void clean() {
+    proxyClassLoader = new ProxyClassLoader();
+    cache.clear();
+  }
 }
 

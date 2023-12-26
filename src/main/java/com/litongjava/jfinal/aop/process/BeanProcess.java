@@ -20,13 +20,14 @@ public class BeanProcess {
 
   @SuppressWarnings("unchecked")
   public void initAnnotation(List<Class<?>> scannedClasses) {
-    if (scannedClasses == null) {
+    if (scannedClasses == null || scannedClasses.size() < 1) {
       return;
     }
     ConfigurationAnnotaionProcess configurationAnnotaionProcess = new ConfigurationAnnotaionProcess();
     // for(int i=0;i<scannedClasses.size();i++) {
     // log.info("{}",scannedClasses.get(i).toString());
     // }
+
     // interface,impl
     Map<Class<Object>, Class<? extends Object>> mapping = new ConcurrentHashMap<>();
     // 1. 分类为 Configuration类和其他类,先处理Configuration类
@@ -49,8 +50,10 @@ public class BeanProcess {
     MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration = configurationAnnotaionProcess
         .processConfiguration(configurationClass, mapping);
     // Queue<Object> beans = processConfiguration.getR1();
-    List<DestroyableBean> destroyableBeans = processConfiguration.getR2();
-    Aop.addDestroyableBeans(destroyableBeans);
+    if (processConfiguration != null) {
+      List<DestroyableBean> destroyableBeans = processConfiguration.getR2();
+      Aop.addDestroyableBeans(destroyableBeans);
+    }
 
     // 处理autoWird注解,Aop框架已经内置改支持
     // this.processAutowired(beans);

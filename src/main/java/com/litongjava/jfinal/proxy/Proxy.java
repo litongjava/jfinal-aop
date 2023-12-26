@@ -23,6 +23,13 @@ public class Proxy {
    * @return 代理对象
    */
   public static <T> T get(Class<T> target) {
+    if (proxyFactory == null) {
+      proxyFactory = new ProxyFactory();
+    }
     return proxyFactory.get(target);
+  }
+
+  public static void clean() {
+    proxyFactory = null;
   }
 }
