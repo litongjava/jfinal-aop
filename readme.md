@@ -8,7 +8,7 @@ The package is distributed through Maven Central.
 <dependency>
   <groupId>com.litongjava</groupId>
   <artifactId>jfinal-aop</artifactId>
-  <version>1.1.3</version>
+  <version>1.1.7</version>
 </dependency>
 ```
 
