@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.aop.annotation.BeforeStartConfiguration;
-import com.litongjava.jfinal.aop.annotation.Configuration;
+import com.litongjava.jfinal.aop.annotation.AConfiguration;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.model.MultiReturn;
 
@@ -34,8 +34,8 @@ public class BeforeStartConfigurationProcess {
         beforeStartConfigurationClass.add(clazz);
         continue;
       }
-      annotationPresent = clazz.isAnnotationPresent(Configuration.class);
-      Configuration annotation = clazz.getAnnotation(Configuration.class);
+      annotationPresent = clazz.isAnnotationPresent(AConfiguration.class);
+      //AConfiguration annotation = clazz.getAnnotation(AConfiguration.class);
         
       // log.info("{},{}",clazz.toString(),annotationPresent);
       if (annotationPresent) {

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.litongjava.jfinal.aop.annotation.AAutowired;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.proxy.Proxy;
 import com.litongjava.jfinal.proxy.ProxyMethodCache;
@@ -316,7 +317,7 @@ public class AopFactory {
     Field[] fields = targetClass.getDeclaredFields();
     if (fields.length != 0) {
       for (Field field : fields) {
-        if (field.isAnnotationPresent(Autowired.class)) {
+        if (field.isAnnotationPresent(AAutowired.class)) {
           Class<?> typeMaybeInterface = field.getType();
           Object fieldInjectedObject = null;
           // 从interfaceMapping中查找实现类
@@ -358,7 +359,7 @@ public class AopFactory {
     Field[] fields = targetClass.getDeclaredFields();
     if (fields.length != 0) {
       for (Field field : fields) {
-        if (field.isAnnotationPresent(Autowired.class)) {
+        if (field.isAnnotationPresent(AAutowired.class)) {
           Class<?> typeMaybeInterface = field.getType();
           Object fieldInjectedObject = null;
           // 从interfaceMapping中查找实现类
@@ -503,7 +504,6 @@ public class AopFactory {
    * @param from 父类或者接口 
    * @return 如果映射存在则返回映射值，否则返回参数 from 的值
    */
-  @SuppressWarnings("unchecked")
   public Class<?> getMappingClass(Class<?> from) {
     if (mapping != null) {
       Class<?> ret = mapping.get(from);
@@ -560,11 +560,10 @@ public class AopFactory {
     singletonCache = new ConcurrentHashMap<Class<?>, Object>();
     Proxy.clean();
     ProxyMethodCache.clean();
-    
+
     // 支持循环注入
     singletonTl = initThreadLocalHashMap();
     prototypeTl = initThreadLocalHashMap();
-    
 
     // 父类到子类、接口到实现类之间的映射关系
     mapping = null;

@@ -1,4 +1,4 @@
-package com.litongjava.jfinal.aop;
+package com.litongjava.jfinal.aop.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Autowired {
+public @interface AAutowired {
 
 	/**
 	 * Declares whether the annotated dependency is required.

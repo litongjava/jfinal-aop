@@ -2,18 +2,18 @@ package com.litongjava.jfinal.aop.annotation;
 
 /**
  * Enumeration of the type filters that may be used in conjunction with
- * {@link ComponentScan @ComponentScan}.
+ * {@link AComponentScan @ComponentScan}.
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 2.5
- * @see ComponentScan
- * @see ComponentScan#includeFilters()
- * @see ComponentScan#excludeFilters()
+ * @see AComponentScan
+ * @see AComponentScan#includeFilters()
+ * @see AComponentScan#excludeFilters()
  * @see org.springframework.core.type.filter.TypeFilter
  */
-public enum FilterType {
+public enum AFilterType {
 
   /**
    * Filter candidates marked with a given annotation.

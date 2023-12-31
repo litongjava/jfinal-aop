@@ -4,11 +4,11 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.litongjava.jfinal.aop.annotation.Component;
-import com.litongjava.jfinal.aop.annotation.Controller;
-import com.litongjava.jfinal.aop.annotation.HttpApi;
-import com.litongjava.jfinal.aop.annotation.Repository;
-import com.litongjava.jfinal.aop.annotation.Service;
+import com.litongjava.jfinal.aop.annotation.AComponent;
+import com.litongjava.jfinal.aop.annotation.AController;
+import com.litongjava.jfinal.aop.annotation.AHttpApi;
+import com.litongjava.jfinal.aop.annotation.ARepository;
+import com.litongjava.jfinal.aop.annotation.AService;
 
 /**
  * 允许外部类添加组件注解
@@ -33,15 +33,15 @@ public class ComponentAnnotation {
    * @return
    */
   public static boolean isComponent(Class<?> clazz) {
-    boolean isComponent = clazz.isAnnotationPresent(Component.class)
+    boolean isComponent = clazz.isAnnotationPresent(AComponent.class)
         //
-        || clazz.isAnnotationPresent(Controller.class)
+        || clazz.isAnnotationPresent(AController.class)
         //
-        || clazz.isAnnotationPresent(Service.class)
+        || clazz.isAnnotationPresent(AService.class)
         //
-        || clazz.isAnnotationPresent(Repository.class)
+        || clazz.isAnnotationPresent(ARepository.class)
         //
-        || clazz.isAnnotationPresent(HttpApi.class);
+        || clazz.isAnnotationPresent(AHttpApi.class);
     if (isComponent) {
       return isComponent;
     }

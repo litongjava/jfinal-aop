@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-public @interface ComponentScan {
+public @interface AComponentScan {
 
   String[] value() default "";
 
@@ -20,8 +20,8 @@ public @interface ComponentScan {
   Filter[] excludeFilters() default {};
 
   /**
-   * Declares the type filter to be used as an {@linkplain ComponentScan#includeFilters
-   * include filter} or {@linkplain ComponentScan#excludeFilters exclude filter}.
+   * Declares the type filter to be used as an {@linkplain AComponentScan#includeFilters
+   * include filter} or {@linkplain AComponentScan#excludeFilters exclude filter}.
    */
   @Retention(RetentionPolicy.RUNTIME)
   @Target({})
@@ -29,11 +29,11 @@ public @interface ComponentScan {
 
     /**
      * The type of filter to use.
-     * <p>Default is {@link FilterType#ANNOTATION}.
+     * <p>Default is {@link AFilterType#ANNOTATION}.
      * @see #classes
      * @see #pattern
      */
-    FilterType type() default FilterType.ANNOTATION;
+    AFilterType type() default AFilterType.ANNOTATION;
 
     /**
      * Alias for {@link #classes}.
@@ -48,11 +48,11 @@ public @interface ComponentScan {
      * based on the configured value of the {@link #type} attribute.
      * <table border="1">
      * <tr><th>{@code FilterType}</th><th>Class Interpreted As</th></tr>
-     * <tr><td>{@link FilterType#ANNOTATION ANNOTATION}</td>
+     * <tr><td>{@link AFilterType#ANNOTATION ANNOTATION}</td>
      * <td>the annotation itself</td></tr>
-     * <tr><td>{@link FilterType#ASSIGNABLE_TYPE ASSIGNABLE_TYPE}</td>
+     * <tr><td>{@link AFilterType#ASSIGNABLE_TYPE ASSIGNABLE_TYPE}</td>
      * <td>the type that detected components should be assignable to</td></tr>
-     * <tr><td>{@link FilterType#CUSTOM CUSTOM}</td>
+     * <tr><td>{@link AFilterType#CUSTOM CUSTOM}</td>
      * <td>an implementation of {@link TypeFilter}</td></tr>
      * </table>
      * <p>When multiple classes are specified, <em>OR</em> logic is applied
@@ -78,9 +78,9 @@ public @interface ComponentScan {
     /**
      * The pattern (or patterns) to use for the filter, as an alternative
      * to specifying a Class {@link #value}.
-     * <p>If {@link #type} is set to {@link FilterType#ASPECTJ ASPECTJ},
+     * <p>If {@link #type} is set to {@link AFilterType#ASPECTJ ASPECTJ},
      * this is an AspectJ type pattern expression. If {@link #type} is
-     * set to {@link FilterType#REGEX REGEX}, this is a regex pattern
+     * set to {@link AFilterType#REGEX REGEX}, this is a regex pattern
      * for the fully-qualified class names to match.
      * @see #type
      * @see #classes

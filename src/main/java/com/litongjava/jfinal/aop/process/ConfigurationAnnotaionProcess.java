@@ -11,8 +11,8 @@ import java.util.Queue;
 
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.aop.AopManager;
-import com.litongjava.jfinal.aop.annotation.Bean;
-import com.litongjava.jfinal.aop.annotation.Initialization;
+import com.litongjava.jfinal.aop.annotation.ABean;
+import com.litongjava.jfinal.aop.annotation.AInitialization;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.model.MultiReturn;
 import com.litongjava.jfinal.model.Pair;
@@ -38,18 +38,19 @@ public class ConfigurationAnnotaionProcess {
     List<Pair<Method, Class<?>>> initializationMethods = new ArrayList<>();
     for (Class<?> clazz : configurationClass) {
       for (Method method : clazz.getDeclaredMethods()) {
-        if (method.isAnnotationPresent(Bean.class)) {
+        if (method.isAnnotationPresent(ABean.class)) {
           beanMethods.add(new Pair<>(method, clazz));
         }
-        if (method.isAnnotationPresent(Initialization.class)) {
+        if (method.isAnnotationPresent(AInitialization.class)) {
           initializationMethods.add(new Pair<>(method, clazz));
         }
       }
     }
 
     // 2. 按照priority对beanMethods排序
-    beanMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(Bean.class).priority()));
-    initializationMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(Initialization.class).priority()));
+    beanMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(ABean.class).priority()));
+    initializationMethods
+        .sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(AInitialization.class).priority()));
     Queue<Object> beans = new LinkedList<>();
     List<DestroyableBean> destroyableBeans = new ArrayList<>();
     // 3. 初始化beans
@@ -57,7 +58,7 @@ public class ConfigurationAnnotaionProcess {
       Object beanInstance = this.processConfigBean(beanMethod.getValue(), beanMethod.getKey(), mapping);
       beans.add(beanInstance);
 
-      Bean beanAnnotation = beanMethod.getKey().getAnnotation(Bean.class);
+      ABean beanAnnotation = beanMethod.getKey().getAnnotation(ABean.class);
       if (!beanAnnotation.destroyMethod().isEmpty()) {
 
         try {
@@ -90,19 +91,20 @@ public class ConfigurationAnnotaionProcess {
    */
   public Object processConfigBean(Class<?> clazz, Method method, Map<Class<Object>, Class<? extends Object>> mapping) {
     try {
+      log.info("config {}", clazz.getSimpleName());
       // 调用 @Bean 方法
       Object object = Aop.get(clazz, mapping);
       Object bean = method.invoke(object);
 
       // 如果 @Bean 注解中定义了 initMethod，调用该方法进行初始化
-      Bean beanAnnotation = method.getAnnotation(Bean.class);
+      ABean beanAnnotation = method.getAnnotation(ABean.class);
       if (!beanAnnotation.initMethod().isEmpty()) {
         Method initMethod = bean.getClass().getMethod(beanAnnotation.initMethod());
         initMethod.invoke(bean);
       }
       Class<? extends Object> realBeanClass = bean.getClass();
       String beanClassName = realBeanClass.getName();
-      log.info("inited config bean:{}", beanClassName);
+      log.info("start init config bean:{}", beanClassName);
 
       Class<?> returnType = method.getReturnType();
       // 将bean添加到容器中，或进行其他操作,

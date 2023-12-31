@@ -15,26 +15,26 @@ import java.lang.annotation.Target;
  * patterns sense), or something similar. This annotation is a general-purpose stereotype
  * and individual teams may narrow their semantics and use as appropriate.
  *
- * <p>This annotation serves as a specialization of {@link Component @Component},
+ * <p>This annotation serves as a specialization of {@link AComponent @Component},
  * allowing for implementation classes to be autodetected through classpath scanning.
  *
  * @author Juergen Hoeller
  * @since 2.5
- * @see Component
- * @see Repository
+ * @see AComponent
+ * @see ARepository
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Component
-public @interface Service {
+@AComponent
+public @interface AService {
 
 	/**
 	 * The value may indicate a suggestion for a logical component name,
 	 * to be turned into a Spring bean in case of an autodetected component.
 	 * @return the suggested component name, if any (or empty String otherwise)
 	 */
-	@AliasFor(annotation = Component.class)
+	@AliasFor(annotation = AComponent.class)
 	String value() default "";
 
 }

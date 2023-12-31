@@ -12,8 +12,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
-import com.litongjava.jfinal.aop.annotation.ComponentScan;
-import com.litongjava.jfinal.aop.annotation.ComponentScan.Filter;
+import com.litongjava.jfinal.aop.annotation.AComponentScan;
+import com.litongjava.jfinal.aop.annotation.AComponentScan.Filter;
 
 public class ComponentScanner {
 
@@ -24,7 +24,7 @@ public class ComponentScanner {
 
     for (Class<?> primarySource : primarySources) {
       // 获取注解值
-      ComponentScan componentScan = primarySource.getAnnotation(ComponentScan.class);
+      AComponentScan componentScan = primarySource.getAnnotation(AComponentScan.class);
       if (componentScan != null) {
         // 添加排除的过滤器
         for (Filter filter : componentScan.excludeFilters()) {
@@ -54,38 +54,38 @@ public class ComponentScanner {
     List<Class<?>> classes = new ArrayList<>();
     String path = basePackage.replace('.', '/');
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    URL resource = contextClassLoader.getResource(path);
+    // URL resource = contextClassLoader.getResource(path);
+    // 包含class和test-classes
+    Enumeration<URL> resources = contextClassLoader.getResources(path);
+    while (resources.hasMoreElements()) {
+      URL resource = resources.nextElement();
+      URLConnection connection = resource.openConnection();
+      if (connection instanceof JarURLConnection) {
+        // 处理 Jar 文件
+        JarURLConnection jarConnection = (JarURLConnection) connection;
+        JarFile jarFile = jarConnection.getJarFile();
 
-    if (resource == null) {
-      throw new IllegalArgumentException("No directory found for package " + basePackage);
-    }
-
-    URLConnection connection = resource.openConnection();
-    if (connection instanceof JarURLConnection) {
-      // 处理 Jar 文件
-      JarURLConnection jarConnection = (JarURLConnection) connection;
-      JarFile jarFile = jarConnection.getJarFile();
-
-      Enumeration<JarEntry> entries = jarFile.entries();
-      while (entries.hasMoreElements()) {
-        JarEntry entry = entries.nextElement();
-        String entryName = entry.getName();
-        if (entryName.startsWith(path) && entryName.endsWith(".class")) {
-          String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
-          Class<?> clazz = contextClassLoader.loadClass(className);
-          classes.add(clazz);
+        Enumeration<JarEntry> entries = jarFile.entries();
+        while (entries.hasMoreElements()) {
+          JarEntry entry = entries.nextElement();
+          String entryName = entry.getName();
+          if (entryName.startsWith(path) && entryName.endsWith(".class")) {
+            String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
+            Class<?> clazz = contextClassLoader.loadClass(className);
+            classes.add(clazz);
+          }
         }
-      }
-    } else {
-      // Handle file system resources, as you did before
-      File directory = new File(resource.getFile());
-      for (File file : directory.listFiles()) {
-        if (file.isDirectory()) {
-          classes.addAll(findClasses(basePackage + "." + file.getName(), excludeFilters));
-        } else if (file.getName().endsWith(".class")) {
-          String className = basePackage + '.' + file.getName().substring(0, file.getName().length() - 6);
-          Class<?> clazz = contextClassLoader.loadClass(className);
-          classes.add(clazz);
+      } else {
+        // Handle file system resources, as you did before
+        File directory = new File(resource.getFile());
+        for (File file : directory.listFiles()) {
+          if (file.isDirectory()) {
+            classes.addAll(findClasses(basePackage + "." + file.getName(), excludeFilters));
+          } else if (file.getName().endsWith(".class")) {
+            String className = basePackage + '.' + file.getName().substring(0, file.getName().length() - 6);
+            Class<?> clazz = contextClassLoader.loadClass(className);
+            classes.add(clazz);
+          }
         }
       }
     }

@@ -8,8 +8,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.litongjava.jfinal.aop.Aop;
-import com.litongjava.jfinal.aop.Autowired;
-import com.litongjava.jfinal.aop.annotation.Configuration;
+import com.litongjava.jfinal.aop.annotation.AAutowired;
+import com.litongjava.jfinal.aop.annotation.AConfiguration;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.model.MultiReturn;
 
@@ -32,7 +32,7 @@ public class BeanProcess {
     Map<Class<Object>, Class<? extends Object>> mapping = new ConcurrentHashMap<>();
     // 1. 分类为 Configuration类和其他类,先处理Configuration类
     for (Class<?> clazz : scannedClasses) {
-      boolean annotationPresent = clazz.isAnnotationPresent(Configuration.class);
+      boolean annotationPresent = clazz.isAnnotationPresent(AConfiguration.class);
       // log.info("{},{}",clazz.toString(),annotationPresent);
       if (annotationPresent) {
         configurationClass.add(clazz);
@@ -81,7 +81,7 @@ public class BeanProcess {
     for (Object bean : beans) {
       Class<?> clazz = bean.getClass();
       for (Field field : clazz.getDeclaredFields()) {
-        if (field.isAnnotationPresent(Autowired.class)) {
+        if (field.isAnnotationPresent(AAutowired.class)) {
           Object value = Aop.get(field.getType());
           try {
             field.setAccessible(true);
