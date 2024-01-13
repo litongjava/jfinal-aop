@@ -160,5 +160,4 @@ public class Aop {
   public static void addFetchBeanAnnotations(Class<? extends Annotation>... classes) {
     aopFactory.addFetchBeanAnnotations(classes);
   }
-
 }

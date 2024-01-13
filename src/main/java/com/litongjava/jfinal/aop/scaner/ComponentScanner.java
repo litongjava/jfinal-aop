@@ -7,7 +7,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
@@ -15,6 +17,9 @@ import java.util.regex.Pattern;
 import com.litongjava.jfinal.aop.annotation.AComponentScan;
 import com.litongjava.jfinal.aop.annotation.AComponentScan.Filter;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ComponentScanner {
 
   public static List<Class<?>> scan(Class<?>... primarySources) throws Exception {
@@ -54,12 +59,16 @@ public class ComponentScanner {
     List<Class<?>> classes = new ArrayList<>();
     String path = basePackage.replace('.', '/');
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    // URL resource = contextClassLoader.getResource(path);
-    // 包含class和test-classes
     Enumeration<URL> resources = contextClassLoader.getResources(path);
+    List<URL> findedResource = new ArrayList<>();
     while (resources.hasMoreElements()) {
       URL resource = resources.nextElement();
+      if (findedResource.contains(resource)) {
+        continue;
+      }
+      findedResource.add(resource);
       URLConnection connection = resource.openConnection();
+      log.info("resource:{}", resource);
       if (connection instanceof JarURLConnection) {
         // 处理 Jar 文件
         JarURLConnection jarConnection = (JarURLConnection) connection;
@@ -76,15 +85,32 @@ public class ComponentScanner {
           }
         }
       } else {
-        // Handle file system resources, as you did before
-        File directory = new File(resource.getFile());
-        for (File file : directory.listFiles()) {
-          if (file.isDirectory()) {
-            classes.addAll(findClasses(basePackage + "." + file.getName(), excludeFilters));
-          } else if (file.getName().endsWith(".class")) {
-            String className = basePackage + '.' + file.getName().substring(0, file.getName().length() - 6);
-            Class<?> clazz = contextClassLoader.loadClass(className);
-            classes.add(clazz);
+        File classRootDirctory = new File(resource.getFile());
+        Queue<File> directories = new LinkedList<>();
+        directories.add(classRootDirctory);
+
+        while (!directories.isEmpty()) {
+          File currentDirectory = directories.poll();
+          for (File file : currentDirectory.listFiles()) {
+            if (file.isDirectory()) {
+              directories.add(file);
+            } else if (file.getName().endsWith(".class")) {
+              log.info("class:{}", file.getName());
+              String className = file.getName().substring(0, file.getName().length() - 6);
+              String classFullName = null;
+              if (currentDirectory != classRootDirctory) {
+                classFullName = basePackage + '.' + currentDirectory.getName() + "." + className;
+              } else {
+                classFullName = basePackage + '.' + className;
+              }
+
+              try {
+                Class<?> clazz = contextClassLoader.loadClass(classFullName);
+                classes.add(clazz);
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+            }
           }
         }
       }

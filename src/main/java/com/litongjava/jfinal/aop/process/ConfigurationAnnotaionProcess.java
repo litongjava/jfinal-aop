@@ -30,7 +30,7 @@ public class ConfigurationAnnotaionProcess {
    */
   public MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(
       Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
-    //边界处理
+    // 边界处理
     if (configurationClass == null || configurationClass.size() < 1) {
       return null;
     }
@@ -56,6 +56,7 @@ public class ConfigurationAnnotaionProcess {
     List<DestroyableBean> destroyableBeans = new ArrayList<>();
     // 3. 初始化beans
     for (Pair<Method, Class<?>> beanMethod : beanMethods) {
+      // 处理配置bean
       Object beanInstance = this.processConfigBean(beanMethod.getValue(), beanMethod.getKey(), mapping);
       beans.add(beanInstance);
 
@@ -92,20 +93,19 @@ public class ConfigurationAnnotaionProcess {
    */
   public Object processConfigBean(Class<?> clazz, Method method, Map<Class<Object>, Class<? extends Object>> mapping) {
     try {
-      log.info("config {}", clazz.getSimpleName());
+      log.info("start init config bean:{}", method);
       // 调用 @Bean 方法
       Object object = Aop.get(clazz, mapping);
       Object bean = method.invoke(object);
+      Class<? extends Object> realBeanClass = bean.getClass();
+      String beanClassName = realBeanClass.getName();
 
       // 如果 @Bean 注解中定义了 initMethod，调用该方法进行初始化
       ABean beanAnnotation = method.getAnnotation(ABean.class);
       if (!beanAnnotation.initMethod().isEmpty()) {
-        Method initMethod = bean.getClass().getMethod(beanAnnotation.initMethod());
+        Method initMethod = realBeanClass.getMethod(beanAnnotation.initMethod());
         initMethod.invoke(bean);
       }
-      Class<? extends Object> realBeanClass = bean.getClass();
-      String beanClassName = realBeanClass.getName();
-      log.info("start init config bean:{}", beanClassName);
 
       Class<?> returnType = method.getReturnType();
       // 将bean添加到容器中，或进行其他操作,
