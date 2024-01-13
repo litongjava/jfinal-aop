@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.litongjava.jfinal.kit.SyncWriteMap;
+import com.jfinal.kit.SyncWriteMap;
 
 /**
  * ProxyMethodCache

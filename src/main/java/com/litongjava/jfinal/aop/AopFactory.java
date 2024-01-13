@@ -1,5 +1,6 @@
 package com.litongjava.jfinal.aop;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import com.litongjava.jfinal.aop.annotation.AAutowired;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.proxy.Proxy;
 import com.litongjava.jfinal.proxy.ProxyMethodCache;
+import com.litongjava.jfinal.spring.SpringBeanContextUtils;
 
 /**
  * AopFactory 是工具类 Aop 功能的具体实现，详细用法见 Aop
@@ -36,6 +38,22 @@ public class AopFactory {
   protected boolean injectSuperClass = false; // 默认不对超类进行注入
 
   protected List<DestroyableBean> destroyableBeans = new ArrayList<>();
+
+  private List<Class<? extends Annotation>> fetchBeanAnnotations = new ArrayList<>();
+
+  private boolean enableWithSpring = false;
+
+  public boolean getEnableWithSpring() {
+    return enableWithSpring;
+  }
+
+  public void setEnableWithSpring(boolean enableWithSpring) {
+    this.enableWithSpring = enableWithSpring;
+  }
+
+  public AopFactory() {
+    fetchBeanAnnotations.add(AAutowired.class);
+  }
 
   public ThreadLocal<HashMap<Class<?>, Object>> initThreadLocalHashMap() {
     return new ThreadLocal<HashMap<Class<?>, Object>>() {
@@ -66,6 +84,17 @@ public class AopFactory {
   protected <T> T doGet(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
     // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
     // targetClass = (Class<T>)getUsefulClass(targetClass);
+    // 先从 spring bean重启中,获取获取不到在到jfinal bean容器中获取
+    if (enableWithSpring) {
+      try {
+        T bean = SpringBeanContextUtils.getBean(targetClass);
+        if (bean != null) {
+          return bean;
+        }
+      } catch (Exception e) {
+        // 不用处理,程序继续向下执行
+      }
+    }
 
     targetClass = (Class<T>) getMappingClass(targetClass);
 
@@ -127,6 +156,16 @@ public class AopFactory {
     // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
     // targetClass = (Class<T>)getUsefulClass(targetClass);
 
+    if (enableWithSpring) {
+      try {
+        T bean = SpringBeanContextUtils.getBean(targetClass);
+        if (bean != null) {
+          return bean;
+        }
+      } catch (Exception e) {
+        // 不用处理,程序继续向下执行
+      }
+    }
     targetClass = (Class<T>) getMappingClass(targetClass);
 
     Singleton si = targetClass.getAnnotation(Singleton.class);
@@ -317,24 +356,27 @@ public class AopFactory {
     Field[] fields = targetClass.getDeclaredFields();
     if (fields.length != 0) {
       for (Field field : fields) {
-        if (field.isAnnotationPresent(AAutowired.class)) {
-          Class<?> typeMaybeInterface = field.getType();
-          Object fieldInjectedObject = null;
-          // 从interfaceMapping中查找实现类
-          if (interfaceMapping != null) {
-            Class<? extends Object> implClazz = interfaceMapping.get(typeMaybeInterface);
-            if (implClazz != null) {
-              fieldInjectedObject = doGetgetWithMapping(implClazz, typeMaybeInterface, interfaceMapping);
-              interfaceMapping.remove(typeMaybeInterface);
-            } else {
-              fieldInjectedObject = doGetgetWithMapping(typeMaybeInterface, interfaceMapping);
-            }
+        for (Class<? extends Annotation> clazz : fetchBeanAnnotations) {
+          // if (field.isAnnotationPresent(AAutowired.class)) {
+          if (field.isAnnotationPresent(clazz)) {
+            Class<?> typeMaybeInterface = field.getType();
+            Object fieldInjectedObject = null;
+            // 从interfaceMapping中查找实现类
+            if (interfaceMapping != null) {
+              Class<? extends Object> implClazz = interfaceMapping.get(typeMaybeInterface);
+              if (implClazz != null) {
+                fieldInjectedObject = doGetgetWithMapping(implClazz, typeMaybeInterface, interfaceMapping);
+                interfaceMapping.remove(typeMaybeInterface);
+              } else {
+                fieldInjectedObject = doGetgetWithMapping(typeMaybeInterface, interfaceMapping);
+              }
 
-          } else {
-            fieldInjectedObject = doGet(typeMaybeInterface);
+            } else {
+              fieldInjectedObject = doGet(typeMaybeInterface);
+            }
+            field.setAccessible(true);
+            field.set(targetObject, fieldInjectedObject);
           }
-          field.setAccessible(true);
-          field.set(targetObject, fieldInjectedObject);
         }
 
         Inject inject = field.getAnnotation(Inject.class);
@@ -359,13 +401,15 @@ public class AopFactory {
     Field[] fields = targetClass.getDeclaredFields();
     if (fields.length != 0) {
       for (Field field : fields) {
-        if (field.isAnnotationPresent(AAutowired.class)) {
-          Class<?> typeMaybeInterface = field.getType();
-          Object fieldInjectedObject = null;
-          // 从interfaceMapping中查找实现类
-          fieldInjectedObject = doGet(typeMaybeInterface);
-          field.setAccessible(true);
-          field.set(targetObject, fieldInjectedObject);
+        for (Class<? extends Annotation> clazz : fetchBeanAnnotations) {
+          if (field.isAnnotationPresent(clazz)) {
+            Class<?> typeMaybeInterface = field.getType();
+            Object fieldInjectedObject = null;
+            // 从interfaceMapping中查找实现类
+            fieldInjectedObject = doGet(typeMaybeInterface);
+            field.setAccessible(true);
+            field.set(targetObject, fieldInjectedObject);
+          }
         }
 
         Inject inject = field.getAnnotation(Inject.class);
@@ -579,6 +623,16 @@ public class AopFactory {
 
   public void addDestroyableBeans(List<DestroyableBean> destroyableBeans) {
     this.destroyableBeans.addAll(destroyableBeans);
+  }
+
+  public void addFetchBeanAnnotation(Class<? extends Annotation> claszz) {
+    fetchBeanAnnotations.add(claszz);
+  }
+
+  public void addFetchBeanAnnotations(Class<? extends Annotation>[] classes) {
+    for (Class<? extends Annotation> clazz : classes) {
+      fetchBeanAnnotations.add(clazz);
+    }
   }
 
 }

@@ -22,12 +22,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jfinal.kit.Kv;
 import com.jfinal.template.Engine;
 import com.jfinal.template.Template;
 import com.litongjava.jfinal.aop.Before;
 import com.litongjava.jfinal.aop.Clear;
 import com.litongjava.jfinal.aop.InterceptorManager;
-import com.litongjava.jfinal.kit.Kv;
 
 import lombok.extern.slf4j.Slf4j;
 

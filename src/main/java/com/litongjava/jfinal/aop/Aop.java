@@ -130,7 +130,7 @@ public class Aop {
   public static boolean isComponent(Class<?> clazz) {
     return ComponentAnnotation.isComponent(clazz);
   }
-  
+
   public static Class<?> addComponentAnnotation(Class<? extends Annotation> clazz) {
     return ComponentAnnotation.addComponentAnnotation(clazz);
   }
@@ -149,6 +149,16 @@ public class Aop {
 
   public static List<Class<?>> processBeforeStartConfiguration(List<Class<?>> scannedClasses) {
     return new BeforeStartConfigurationProcess().process(scannedClasses);
+  }
+
+  public static void addFetchBeanAnnotation(Class<? extends Annotation> claszz) {
+    aopFactory.addFetchBeanAnnotation(claszz);
+
+  }
+
+  @SafeVarargs
+  public static void addFetchBeanAnnotations(Class<? extends Annotation>... classes) {
+    aopFactory.addFetchBeanAnnotations(classes);
   }
 
 }

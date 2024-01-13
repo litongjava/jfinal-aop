@@ -30,6 +30,7 @@ public class ConfigurationAnnotaionProcess {
    */
   public MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(
       Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
+    //边界处理
     if (configurationClass == null || configurationClass.size() < 1) {
       return null;
     }
