@@ -140,7 +140,7 @@ public class Aop {
   }
 
   public static List<Class<?>> scan(Class<?>... primarySources) throws Exception {
-    return ComponentScanner.scan(primarySources);
+    return ComponentScanner.scan(primarySources,false);
   }
 
   public static void initAnnotation(List<Class<?>> scannedClasses) {

@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ComponentScanner {
 
-  public static List<Class<?>> scan(Class<?>... primarySources) throws Exception {
+  public static List<Class<?>> scan(Class<?>[] primarySources, boolean printScannedClasses) throws Exception {
     List<Class<?>> classes = new ArrayList<>();
     List<Filter> allExcludeFilters = new ArrayList<>();
     List<String> allBasePackages = new ArrayList<>();
@@ -49,13 +49,13 @@ public class ComponentScanner {
     }
 
     for (String basePackage : allBasePackages) {
-      classes.addAll(findClasses(basePackage, allExcludeFilters.toArray(new Filter[0])));
+      classes.addAll(findClasses(basePackage, allExcludeFilters.toArray(new Filter[0]),printScannedClasses));
     }
 
     return classes;
   }
 
-  private static List<Class<?>> findClasses(String basePackage, Filter[] excludeFilters) throws Exception {
+  private static List<Class<?>> findClasses(String basePackage, Filter[] excludeFilters,boolean printScannedClasses) throws Exception {
     List<Class<?>> classes = new ArrayList<>();
     String path = basePackage.replace('.', '/');
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -95,7 +95,10 @@ public class ComponentScanner {
             if (file.isDirectory()) {
               directories.add(file);
             } else if (file.getName().endsWith(".class")) {
-              log.info("class:{}", file.getName());
+              if(printScannedClasses) {
+                log.info("class:{}", file.getName());
+              }
+              
               String className = file.getName().substring(0, file.getName().length() - 6);
               String classFullName = null;
               if (currentDirectory != classRootDirctory) {
