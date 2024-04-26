@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
   <artifactId>jfinal-aop</artifactId>
-  <version>1.2.3</version>
+  <version>1.2.4</version>
   <name>final-aop</name>
   <description>from jfinal, based on jvm's native high-performance aop framework</description>
   <url>https://github.com/litongjava/final-aop</url>

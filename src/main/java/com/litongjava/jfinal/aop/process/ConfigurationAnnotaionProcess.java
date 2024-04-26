@@ -132,14 +132,8 @@ public class ConfigurationAnnotaionProcess {
       // 添加到到bean容器
       method.invoke(Aop.get(clazz, mapping));
       // method.invoke(Aop.get(clazz));
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (IllegalArgumentException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (SecurityException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      throw new RuntimeException("error occured while " + clazz.toString() + " " + method.toString());
     }
 
   }
