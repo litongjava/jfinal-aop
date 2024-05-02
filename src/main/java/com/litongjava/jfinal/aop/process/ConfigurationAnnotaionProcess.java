@@ -1,6 +1,5 @@
 package com.litongjava.jfinal.aop.process;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -133,7 +132,9 @@ public class ConfigurationAnnotaionProcess {
       method.invoke(Aop.get(clazz, mapping));
       // method.invoke(Aop.get(clazz));
     } catch (Exception e) {
-      throw new RuntimeException("error occured while " + clazz.toString() + " " + method.toString());
+      log.error("error occured " + method.toString());
+      throw new RuntimeException(e);
+
     }
 
   }
