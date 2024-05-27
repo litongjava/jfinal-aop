@@ -133,8 +133,7 @@ public class ConfigurationAnnotaionProcess {
       // method.invoke(Aop.get(clazz));
     } catch (Exception e) {
       log.error("error occured " + method.toString());
-      throw new RuntimeException(e);
-
+      e.printStackTrace();
     }
 
   }
