@@ -49,13 +49,14 @@ public class ComponentScanner {
     }
 
     for (String basePackage : allBasePackages) {
-      classes.addAll(findClasses(basePackage, allExcludeFilters.toArray(new Filter[0]),printScannedClasses));
+      classes.addAll(findClasses(basePackage, allExcludeFilters.toArray(new Filter[0]), printScannedClasses));
     }
 
     return classes;
   }
 
-  private static List<Class<?>> findClasses(String basePackage, Filter[] excludeFilters,boolean printScannedClasses) throws Exception {
+  private static List<Class<?>> findClasses(String basePackage, Filter[] excludeFilters, boolean printScannedClasses)
+      throws Exception {
     List<Class<?>> classes = new ArrayList<>();
     String path = basePackage.replace('.', '/');
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -95,14 +96,17 @@ public class ComponentScanner {
             if (file.isDirectory()) {
               directories.add(file);
             } else if (file.getName().endsWith(".class")) {
-              if(printScannedClasses) {
+              if (printScannedClasses) {
                 log.info("class:{}", file.getName());
               }
-              
+
               String className = file.getName().substring(0, file.getName().length() - 6);
               String classFullName = null;
               if (currentDirectory != classRootDirctory) {
-                classFullName = basePackage + '.' + currentDirectory.getName() + "." + className;
+                String relativePath = currentDirectory.getAbsolutePath()
+                    .substring(classRootDirctory.getAbsolutePath().length() + 1).replace(File.separatorChar, '.');
+                classFullName = basePackage + '.' + relativePath + '.' + className;
+
               } else {
                 classFullName = basePackage + '.' + className;
               }
