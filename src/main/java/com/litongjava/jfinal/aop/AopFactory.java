@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.litongjava.jfinal.aop.annotation.AAutowired;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.proxy.Proxy;
 import com.litongjava.jfinal.proxy.ProxyMethodCache;
@@ -22,9 +21,11 @@ public class AopFactory {
 
   // 单例缓存
   protected Map<Class<?>, Object> singletonCache = new ConcurrentHashMap<Class<?>, Object>();
+  
 
   // 支持循环注入
-  // protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = ThreadLocal.withInitial(() -> new HashMap<>());
+  // protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl =
+  // ThreadLocal.withInitial(() -> new HashMap<>());
   protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = initThreadLocalHashMap();
 
 //  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = ThreadLocal.withInitial(() -> new HashMap<>());
@@ -49,10 +50,6 @@ public class AopFactory {
 
   public void setEnableWithSpring(boolean enableWithSpring) {
     this.enableWithSpring = enableWithSpring;
-  }
-
-  public AopFactory() {
-    fetchBeanAnnotations.add(AAutowired.class);
   }
 
   public ThreadLocal<HashMap<Class<?>, Object>> initThreadLocalHashMap() {
@@ -110,6 +107,7 @@ public class AopFactory {
 
   @SuppressWarnings("unchecked")
   protected <T> T doGetSingleton(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
+
     Object ret = singletonCache.get(targetClass);
     if (ret != null) {
       return (T) ret;
@@ -143,6 +141,7 @@ public class AopFactory {
           singletonTl.remove();
         }
       }
+
     }
   }
 
@@ -151,8 +150,8 @@ public class AopFactory {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T doGetgetWithMapping(Class<T> targetClass,
-      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+  protected <T> T doGetgetWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
+      throws ReflectiveOperationException {
     // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
     // targetClass = (Class<T>)getUsefulClass(targetClass);
 
@@ -179,8 +178,8 @@ public class AopFactory {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T doGetgetWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface,
-      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+  protected <T> T doGetgetWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
+      throws ReflectiveOperationException {
     targetClass = (Class<T>) getMappingClass(targetClass);
 
     Singleton si = targetClass.getAnnotation(Singleton.class);
@@ -194,16 +193,16 @@ public class AopFactory {
 
   }
 
-  protected <T> T doGetSingletonWithMapping(Class<T> targetClass,
-      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+  protected <T> T doGetSingletonWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
+      throws ReflectiveOperationException {
     return doGetSingletonWithMapping(targetClass, null, interfaceMapping);
   }
 
   /**
    * @param <T>
-   * @param targetClass 目标类
-   * @param typeMaybeInterface 目标类的接口或者抽象类 
-   * @param interfaceMapping 目标类内成员变量的 接口和实现类映射 
+   * @param targetClass        目标类
+   * @param typeMaybeInterface 目标类的接口或者抽象类
+   * @param interfaceMapping   目标类内成员变量的 接口和实现类映射
    * @return
    * @throws ReflectiveOperationException
    */
@@ -251,16 +250,16 @@ public class AopFactory {
     return doGetSingletonWithMapping(targetClass, null);
   }
 
-  protected <T> T doGetPrototypeWithMapping(Class<T> targetClass,
-      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+  protected <T> T doGetPrototypeWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
+      throws ReflectiveOperationException {
     return doGetPrototypeWithMapping(targetClass, null, interfaceMapping);
   }
 
   /**
    * @param <T>
-   * @param targetClass 目标类
-   * @param typeMaybeInterface 目标类的接口或者抽象类 
-   * @param interfaceMapping 目标类内成员变量的 接口和实现类映射 
+   * @param targetClass        目标类
+   * @param typeMaybeInterface 目标类的接口或者抽象类
+   * @param interfaceMapping   目标类内成员变量的 接口和实现类映射
    * @return
    * @throws ReflectiveOperationException
    */
@@ -349,8 +348,8 @@ public class AopFactory {
     }
   }
 
-  protected void doInjectWithMapping(Class<?> targetClass, Object targetObject,
-      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+  protected void doInjectWithMapping(Class<?> targetClass, Object targetObject, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
+      throws ReflectiveOperationException {
 
     targetClass = getUsefulClass(targetClass);
     Field[] fields = targetClass.getDeclaredFields();
@@ -448,21 +447,22 @@ public class AopFactory {
   /**
    * 字符串包含判断之 "_$$_" 支持 javassist，"$$Enhancer" 支持 cglib
    * 
-   * 被 cglib、guice 增强过的类需要通过本方法获取到被增强之前的类型
-   * 否则调用其 targetClass.getDeclaredFields() 方法时
-   * 获取到的是一堆 cglib guice 生成类中的 Field 对象
-   * 而被增强前的原类型中的 Field 反而获取不到
+   * 被 cglib、guice 增强过的类需要通过本方法获取到被增强之前的类型 否则调用其 targetClass.getDeclaredFields()
+   * 方法时 获取到的是一堆 cglib guice 生成类中的 Field 对象 而被增强前的原类型中的 Field 反而获取不到
    */
   protected Class<?> getUsefulClass(Class<?> clazz) {
     // com.demo.blog.Blog$$EnhancerByCGLIB$$69a17158
-    // return (Class<? extends Model>)((modelClass.getName().indexOf("EnhancerByCGLIB") == -1 ? modelClass : modelClass.getSuperclass()));
-    // return (Class<?>)(clazz.getName().indexOf("$$EnhancerBy") == -1 ? clazz : clazz.getSuperclass());
+    // return (Class<? extends
+    // Model>)((modelClass.getName().indexOf("EnhancerByCGLIB") == -1 ? modelClass :
+    // modelClass.getSuperclass()));
+    // return (Class<?>)(clazz.getName().indexOf("$$EnhancerBy") == -1 ? clazz :
+    // clazz.getSuperclass());
     String n = clazz.getName();
     return (Class<?>) (n.indexOf("_$$_") > -1 || n.indexOf("$$Enhancer") > -1 ? clazz.getSuperclass() : clazz);
   }
 
   /**
-   * 设置被注入的对象是否为单例，可使用 @Singleton(boolean) 覆盖此默认值 
+   * 设置被注入的对象是否为单例，可使用 @Singleton(boolean) 覆盖此默认值
    */
   public AopFactory setSingleton(boolean singleton) {
     this.singleton = singleton;
@@ -535,8 +535,7 @@ public class AopFactory {
       if (from.isAssignableFrom(toClass)) {
         return addMapping(from, toClass);
       } else {
-        throw new IllegalArgumentException(
-            "The parameter \"to\" must be the subclass or implementation of the parameter \"from\"");
+        throw new IllegalArgumentException("The parameter \"to\" must be the subclass or implementation of the parameter \"from\"");
       }
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
@@ -545,7 +544,8 @@ public class AopFactory {
 
   /**
    * 获取父类到子类的映射值，或者接口到实现类的映射值
-   * @param from 父类或者接口 
+   * 
+   * @param from 父类或者接口
    * @return 如果映射存在则返回映射值，否则返回参数 from 的值
    */
   public Class<?> getMappingClass(Class<?> from) {
@@ -559,6 +559,7 @@ public class AopFactory {
 
   /**
    * 注册的Bean容器
+   * 
    * @param targetClass
    * @param value
    */
@@ -575,6 +576,7 @@ public class AopFactory {
 
   /**
    * get from singletonCache
+   * 
    * @param type
    * @return
    */

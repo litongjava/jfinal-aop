@@ -1,5 +1,6 @@
 package com.litongjava.jfinal.aop.process;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -91,37 +92,62 @@ public class ConfigurationAnnotaionProcess {
    * @return
    */
   public Object processConfigBean(Class<?> clazz, Method method, Map<Class<Object>, Class<? extends Object>> mapping) {
+    log.info("start init config bean:{}", method);
+    // 调用 @Bean 方法
+    Object object = Aop.get(clazz, mapping);
+    Object bean = null;
     try {
-      log.info("start init config bean:{}", method);
-      // 调用 @Bean 方法
-      Object object = Aop.get(clazz, mapping);
-      Object bean = method.invoke(object);
-      Class<? extends Object> realBeanClass = bean.getClass();
-      String beanClassName = realBeanClass.getName();
-
-      // 如果 @Bean 注解中定义了 initMethod，调用该方法进行初始化
-      ABean beanAnnotation = method.getAnnotation(ABean.class);
-      if (!beanAnnotation.initMethod().isEmpty()) {
-        Method initMethod = realBeanClass.getMethod(beanAnnotation.initMethod());
-        initMethod.invoke(bean);
-      }
-
-      Class<?> returnType = method.getReturnType();
-      // 将bean添加到容器中，或进行其他操作,
-      if (!returnType.getName().equals(realBeanClass.getName())) {
-        AopManager.me().addMapping(returnType, realBeanClass);
-        log.info("add bean mapping:{} from {}", returnType, beanClassName);
-      }
-      AopManager.me().addSingletonObject(bean);
-
-      // 为单例注入依赖以后，再添加为单例供后续使用
-      Aop.inject(bean);
-
-      return bean;
-    } catch (Exception e) {
-      e.printStackTrace();
+      bean = method.invoke(object);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    } catch (IllegalArgumentException e) {
+      throw new RuntimeException(e);
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(e);
+    } catch (SecurityException e) {
+      throw new RuntimeException(e);
     }
-    return null;
+
+    Class<? extends Object> realBeanClass = null;
+    String beanClassName = null;
+    realBeanClass = bean.getClass();
+    beanClassName = realBeanClass.getName();
+    // 如果 @Bean 注解中定义了 initMethod，调用该方法进行初始化
+    ABean beanAnnotation = method.getAnnotation(ABean.class);
+    if (!beanAnnotation.initMethod().isEmpty()) {
+      Method initMethod = null;
+      try {
+        initMethod = realBeanClass.getMethod(beanAnnotation.initMethod());
+      } catch (NoSuchMethodException e) {
+        throw new RuntimeException(e);
+      } catch (SecurityException e) {
+        throw new RuntimeException(e);
+      }
+
+      try {
+        initMethod.invoke(bean);
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException(e);
+      } catch (IllegalArgumentException e) {
+        throw new RuntimeException(e);
+      } catch (InvocationTargetException e) {
+        throw new RuntimeException(e);
+      }
+
+    }
+    Class<?> returnType = method.getReturnType();
+    // 将bean添加到容器中，或进行其他操作,
+    if (!returnType.getName().equals(realBeanClass.getName())) {
+      AopManager.me().addMapping(returnType, realBeanClass);
+      log.info("add bean mapping:{} from {}", returnType, beanClassName);
+    }
+    AopManager.me().addSingletonObject(bean);
+
+    // 为单例注入依赖以后，再添加为单例供后续使用
+    Aop.inject(bean);
+
+    return bean;
+
   }
 
   public void processConfigInitialization(Class<?> clazz, Method method,
