@@ -10,19 +10,17 @@ import com.litongjava.jfinal.aop.AopManager;
 
 public class Dubbo {
 
-  private static Map<Class<?>, Object> dubboCache = new ConcurrentHashMap<>();
+  private static final Map<Class<?>, Object> dubboCache = new ConcurrentHashMap<>();
+  private static final Map<Class<?>, ReferenceConfig<?>> referenceMap = new ConcurrentHashMap<>();
 
-  private static Map<Class<?>, ReferenceConfig<?>> referenceMap = new ConcurrentHashMap<>();
+  private static ApplicationConfig applicationConfig;
+  private static RegistryConfig registryConfig;
+  private static int defaultTimeout;
 
-  private static ApplicationConfig applicationConfig = null;
-  private static RegistryConfig registryConfig = null;
-
-  public static void setApplication(ApplicationConfig applicationConfig) {
-    Dubbo.applicationConfig = applicationConfig;
-  }
-
-  public static void setRegistry(RegistryConfig registryConfig) {
-    Dubbo.registryConfig = registryConfig;
+  public static void initialize(ApplicationConfig appConfig, RegistryConfig regConfig, int timeout) {
+    applicationConfig = appConfig;
+    registryConfig = regConfig;
+    defaultTimeout = timeout;
   }
 
   public static ApplicationConfig getApplicationConfig() {
@@ -45,35 +43,32 @@ public class Dubbo {
       return (T) ret;
     }
 
-    ReferenceConfig<T> reference = new ReferenceConfig<>();
-    reference.setInterface(targetClass);
-    reference.setApplication(applicationConfig);
-    reference.setRegistry(registryConfig);
-
-    referenceMap.put(targetClass, reference);
-
     synchronized (Dubbo.class) {
       ret = dubboCache.get(targetClass);
       if (ret != null) {
         return (T) ret;
       }
 
+      ReferenceConfig<T> reference = new ReferenceConfig<>();
+      reference.setInterface(targetClass);
+      reference.setApplication(applicationConfig);
+      reference.setRegistry(registryConfig);
+      reference.setTimeout(defaultTimeout);
+
+      referenceMap.put(targetClass, reference);
+
       T result = reference.get();
       if (result != null) {
-        // 添加到aop容器
         AopManager.me().addSingletonObject(targetClass, result);
-        // 添加到cache
         dubboCache.put(targetClass, result);
-
       }
+
       return result;
     }
-
   }
 
   public static void clear() {
     referenceMap.clear();
     dubboCache.clear();
   }
-
 }
