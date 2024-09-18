@@ -57,7 +57,13 @@ public class Dubbo {
 
       referenceMap.put(targetClass, reference);
 
-      T result = reference.get();
+      T result = null;
+      try {
+        result = reference.get();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
       if (result != null) {
         AopManager.me().addSingletonObject(targetClass, result);
         dubboCache.put(targetClass, result);
