@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.litongjava.annotation.AConfiguration;
+import com.litongjava.annotation.BeforeStartConfiguration;
 import com.litongjava.jfinal.aop.Aop;
-import com.litongjava.jfinal.aop.annotation.BeforeStartConfiguration;
-import com.litongjava.jfinal.aop.annotation.AConfiguration;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.model.MultiReturn;
 

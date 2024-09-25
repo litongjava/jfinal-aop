@@ -4,7 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
-import com.litongjava.jfinal.aop.annotation.AConfiguration;
+import com.litongjava.annotation.AConfiguration;
 import com.litongjava.jfinal.aop.process.BeanProcess;
 import com.litongjava.jfinal.aop.process.BeforeStartConfigurationProcess;
 import com.litongjava.jfinal.aop.process.ComponentAnnotation;

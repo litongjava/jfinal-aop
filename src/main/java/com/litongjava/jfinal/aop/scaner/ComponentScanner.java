@@ -14,8 +14,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
-import com.litongjava.jfinal.aop.annotation.AComponentScan;
-import com.litongjava.jfinal.aop.annotation.AComponentScan.Filter;
+import com.litongjava.annotation.AComponentScan;
+import com.litongjava.annotation.AComponentScan.Filter;
 
 import lombok.extern.slf4j.Slf4j;
 

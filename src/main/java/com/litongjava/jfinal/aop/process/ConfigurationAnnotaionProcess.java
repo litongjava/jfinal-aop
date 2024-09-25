@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import com.litongjava.annotation.ABean;
+import com.litongjava.annotation.AInitialization;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.aop.AopManager;
-import com.litongjava.jfinal.aop.annotation.ABean;
-import com.litongjava.jfinal.aop.annotation.AInitialization;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.model.MultiReturn;
 import com.litongjava.jfinal.model.Pair;

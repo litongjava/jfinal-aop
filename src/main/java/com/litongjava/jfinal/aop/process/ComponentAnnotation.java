@@ -4,11 +4,11 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.litongjava.jfinal.aop.annotation.AComponent;
-import com.litongjava.jfinal.aop.annotation.AController;
-import com.litongjava.jfinal.aop.annotation.AHttpApi;
-import com.litongjava.jfinal.aop.annotation.ARepository;
-import com.litongjava.jfinal.aop.annotation.AService;
+import com.litongjava.annotation.AComponent;
+import com.litongjava.annotation.AController;
+import com.litongjava.annotation.AHttpApi;
+import com.litongjava.annotation.ARepository;
+import com.litongjava.annotation.AService;
 
 /**
  * 允许外部类添加组件注解

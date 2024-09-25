@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.litongjava.annotation.Inject;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.proxy.Proxy;
 import com.litongjava.jfinal.proxy.ProxyMethodCache;
