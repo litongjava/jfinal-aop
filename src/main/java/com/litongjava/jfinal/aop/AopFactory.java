@@ -22,14 +22,13 @@ public class AopFactory {
 
   // 单例缓存
   protected Map<Class<?>, Object> singletonCache = new ConcurrentHashMap<Class<?>, Object>();
-  
 
   // 支持循环注入
   // protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl =
   // ThreadLocal.withInitial(() -> new HashMap<>());
   protected ThreadLocal<HashMap<Class<?>, Object>> singletonTl = initThreadLocalHashMap();
 
-//  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = ThreadLocal.withInitial(() -> new HashMap<>());
+  //  protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = ThreadLocal.withInitial(() -> new HashMap<>());
   protected ThreadLocal<HashMap<Class<?>, Object>> prototypeTl = initThreadLocalHashMap();
 
   // 父类到子类、接口到实现类之间的映射关系
@@ -42,16 +41,7 @@ public class AopFactory {
   protected List<DestroyableBean> destroyableBeans = new ArrayList<>();
 
   private List<Class<? extends Annotation>> fetchBeanAnnotations = new ArrayList<>();
-
-  private boolean enableWithSpring = false;
-
-  public boolean getEnableWithSpring() {
-    return enableWithSpring;
-  }
-
-  public void setEnableWithSpring(boolean enableWithSpring) {
-    this.enableWithSpring = enableWithSpring;
-  }
+  private boolean enableWithSpring = AopManager.me().getEnableWithSpring();
 
   public ThreadLocal<HashMap<Class<?>, Object>> initThreadLocalHashMap() {
     return new ThreadLocal<HashMap<Class<?>, Object>>() {
@@ -80,9 +70,7 @@ public class AopFactory {
 
   @SuppressWarnings("unchecked")
   protected <T> T doGet(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
-    // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
-    // targetClass = (Class<T>)getUsefulClass(targetClass);
-    // 先从 spring bean重启中,获取获取不到在到jfinal bean容器中获取
+    //get class from spring
     if (enableWithSpring) {
       try {
         T bean = SpringBeanContextUtils.getBean(targetClass);
@@ -90,7 +78,6 @@ public class AopFactory {
           return bean;
         }
       } catch (Exception e) {
-        // 不用处理,程序继续向下执行
       }
     }
 
@@ -151,8 +138,7 @@ public class AopFactory {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T doGetgetWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
-      throws ReflectiveOperationException {
+  protected <T> T doGetgetWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
     // targetClass = (Class<T>)getUsefulClass(targetClass);
 
@@ -179,8 +165,7 @@ public class AopFactory {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T doGetgetWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
-      throws ReflectiveOperationException {
+  protected <T> T doGetgetWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     targetClass = (Class<T>) getMappingClass(targetClass);
 
     Singleton si = targetClass.getAnnotation(Singleton.class);
@@ -194,8 +179,7 @@ public class AopFactory {
 
   }
 
-  protected <T> T doGetSingletonWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
-      throws ReflectiveOperationException {
+  protected <T> T doGetSingletonWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     return doGetSingletonWithMapping(targetClass, null, interfaceMapping);
   }
 
@@ -208,8 +192,7 @@ public class AopFactory {
    * @throws ReflectiveOperationException
    */
   @SuppressWarnings("unchecked")
-  protected <T> T doGetSingletonWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface,
-      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+  protected <T> T doGetSingletonWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     Object ret = singletonCache.get(targetClass);
     if (ret != null) {
       return (T) ret;
@@ -251,8 +234,7 @@ public class AopFactory {
     return doGetSingletonWithMapping(targetClass, null);
   }
 
-  protected <T> T doGetPrototypeWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
-      throws ReflectiveOperationException {
+  protected <T> T doGetPrototypeWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     return doGetPrototypeWithMapping(targetClass, null, interfaceMapping);
   }
 
@@ -265,8 +247,7 @@ public class AopFactory {
    * @throws ReflectiveOperationException
    */
   @SuppressWarnings("unchecked")
-  protected <T> T doGetPrototypeWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface,
-      Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
+  protected <T> T doGetPrototypeWithMapping(Class<T> targetClass, Class<?> typeMaybeInterface, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     Object ret;
 
     HashMap<Class<?>, Object> map = prototypeTl.get();
@@ -349,8 +330,7 @@ public class AopFactory {
     }
   }
 
-  protected void doInjectWithMapping(Class<?> targetClass, Object targetObject, Map<Class<Object>, Class<? extends Object>> interfaceMapping)
-      throws ReflectiveOperationException {
+  protected void doInjectWithMapping(Class<?> targetClass, Object targetObject, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
 
     targetClass = getUsefulClass(targetClass);
     Field[] fields = targetClass.getDeclaredFields();

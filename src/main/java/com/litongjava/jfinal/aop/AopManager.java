@@ -27,6 +27,24 @@ public class AopManager {
 	
 	private static final AopManager me = new AopManager();
 	
+  private boolean enableWithSpring = false;
+  private boolean enableDubbo = false;
+
+  public boolean getEnableWithSpring() {
+    return enableWithSpring;
+  }
+
+  public void setEnableWithSpring(boolean enableWithSpring) {
+    this.enableWithSpring = enableWithSpring;
+  }
+  
+  public void setEnableDubbo(boolean enable) {
+    this.enableDubbo=enable;
+  }
+  public boolean getEnableDubbo() {
+    return this.enableDubbo;
+  }
+  
 	private AopManager() {}
 	
 	public static AopManager me() {
