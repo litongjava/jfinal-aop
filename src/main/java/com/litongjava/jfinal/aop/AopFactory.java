@@ -41,7 +41,7 @@ public class AopFactory {
   protected List<DestroyableBean> destroyableBeans = new ArrayList<>();
 
   private List<Class<? extends Annotation>> fetchBeanAnnotations = new ArrayList<>();
-  private boolean enableWithSpring = AopManager.me().getEnableWithSpring();
+  private Boolean enableWithSpring = AopManager.me().getEnableWithSpring();
 
   public ThreadLocal<HashMap<Class<?>, Object>> initThreadLocalHashMap() {
     return new ThreadLocal<HashMap<Class<?>, Object>>() {
@@ -71,7 +71,11 @@ public class AopFactory {
   @SuppressWarnings("unchecked")
   protected <T> T doGet(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
     //get class from spring
-    if (enableWithSpring) {
+    if (enableWithSpring == null) {
+      enableWithSpring = AopManager.me().getEnableWithSpring();
+    }
+
+    if (enableWithSpring != null && enableWithSpring) {
       try {
         T bean = SpringBeanContextUtils.getBean(targetClass);
         if (bean != null) {
@@ -141,8 +145,11 @@ public class AopFactory {
   protected <T> T doGetgetWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
     // targetClass = (Class<T>)getUsefulClass(targetClass);
-
-    if (enableWithSpring) {
+    
+    if (enableWithSpring == null) {
+      enableWithSpring = AopManager.me().getEnableWithSpring();
+    }
+    if (enableWithSpring != null && enableWithSpring) {
       try {
         T bean = SpringBeanContextUtils.getBean(targetClass);
         if (bean != null) {

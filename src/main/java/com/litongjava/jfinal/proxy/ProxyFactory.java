@@ -19,7 +19,7 @@ public class ProxyFactory {
   protected ProxyCompiler proxyCompiler = new ProxyCompiler();
   protected ProxyClassLoader proxyClassLoader = new ProxyClassLoader();
 
-  private boolean enableDubbo = AopManager.me().getEnableDubbo();
+  private Boolean enableDubbo = AopManager.me().getEnableDubbo();
 
   public <T> T get(Class<T> target) {
     try {
@@ -36,7 +36,10 @@ public class ProxyFactory {
         }
 
         if (Modifier.isAbstract(mod)) {
-          if (enableDubbo) {
+          if (enableDubbo == null) {
+            enableDubbo = AopManager.me().getEnableDubbo();
+          }
+          if (enableDubbo != null && enableDubbo) {
             return Dubbo.get(target);
           } else {
             throw new IllegalArgumentException("abstract class or interface can not be proxied : " + target.getName());
