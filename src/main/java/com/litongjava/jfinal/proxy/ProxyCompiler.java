@@ -130,7 +130,7 @@ public class ProxyCompiler {
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {
 			throw new RuntimeException("Can not get javax.tools.JavaCompiler, check whether \"tools.jar\" is in the environment variable CLASSPATH \n" +
-										"Visit https://jfinal.com/doc/4-8 for details \n");
+										"Visit https://tio-boot.litongjava.com/zh/08_aop/03.html for details \n");
 		}
 
 		DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();

@@ -15,7 +15,7 @@ package com.litongjava.jfinal.aop;
  */
 public abstract class PrototypeInterceptor implements AopInterceptor {
 
-  final public void intercept(Invocation inv) {
+  final public void intercept(AopInvocation inv) {
     try {
       getClass().newInstance().doIntercept(inv);
     } catch (RuntimeException e) {
@@ -25,5 +25,5 @@ public abstract class PrototypeInterceptor implements AopInterceptor {
     }
   }
 
-  abstract public void doIntercept(Invocation inv);
+  abstract public void doIntercept(AopInvocation inv);
 }

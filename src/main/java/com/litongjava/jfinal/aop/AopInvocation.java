@@ -12,7 +12,7 @@ import com.litongjava.jfinal.proxy.ProxyMethodCache;
  * Invocation is used to invoke the interceptors and the target method
  */
 @SuppressWarnings("unchecked")
-public class Invocation {
+public class AopInvocation {
 
   private static final Object[] NULL_ARGS = new Object[0]; // Prevent new Object[0] by jvm for args of method invoking
 
@@ -25,7 +25,7 @@ public class Invocation {
 
   private int index = 0;
 
-  public Invocation(Object target, Long proxyMethodKey, Callback callback, Object... args) {
+  public AopInvocation(Object target, Long proxyMethodKey, Callback callback, Object... args) {
     this.target = target;
 
     ProxyMethod proxyMethod = ProxyMethodCache.get(proxyMethodKey);
@@ -36,14 +36,14 @@ public class Invocation {
     this.args = args;
   }
 
-  public Invocation(Object target, Long proxyMethodKey, Callback callback) {
+  public AopInvocation(Object target, Long proxyMethodKey, Callback callback) {
     this(target, proxyMethodKey, callback, NULL_ARGS);
   }
 
   /**
    * 用于扩展 ProxyFactory
    */
-  public Invocation(Object target, Method method, AopInterceptor[] inters, Callback callback, Object[] args) {
+  public AopInvocation(Object target, Method method, AopInterceptor[] inters, Callback callback, Object[] args) {
     this.target = target;
 
     this.method = method;
@@ -54,7 +54,7 @@ public class Invocation {
   }
 
   // InvocationWrapper need this constructor
-  protected Invocation() {
+  protected AopInvocation() {
   }
 
   public Object invoke() {

@@ -15,13 +15,13 @@ import java.lang.reflect.Method;
 /**
  * InvocationWrapper invoke the InterceptorStack.
  */
-class InvocationWrapper extends Invocation {
+class InvocationWrapper extends AopInvocation {
 
   private AopInterceptor[] inters;
-  private Invocation invocation;
+  private AopInvocation invocation;
   private int index = 0;
 
-  InvocationWrapper(Invocation invocation, AopInterceptor[] inters) {
+  InvocationWrapper(AopInvocation invocation, AopInterceptor[] inters) {
     this.invocation = invocation;
     this.inters = inters;
   }

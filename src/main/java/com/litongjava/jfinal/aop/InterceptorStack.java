@@ -41,7 +41,7 @@ public abstract class InterceptorStack implements AopInterceptor {
     return this;
   }
 
-  public final void intercept(Invocation inv) {
+  public final void intercept(AopInvocation inv) {
     new InvocationWrapper(inv, inters).invoke();
   }
 
