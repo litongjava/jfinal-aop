@@ -20,7 +20,7 @@ public class Invocation {
   private Method method;
   private Object[] args;
   private Callback callback;
-  private Interceptor[] inters;
+  private AopInterceptor[] inters;
   private Object returnValue;
 
   private int index = 0;
@@ -43,7 +43,7 @@ public class Invocation {
   /**
    * 用于扩展 ProxyFactory
    */
-  public Invocation(Object target, Method method, Interceptor[] inters, Callback callback, Object[] args) {
+  public Invocation(Object target, Method method, AopInterceptor[] inters, Callback callback, Object[] args) {
     this.target = target;
 
     this.method = method;

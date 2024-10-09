@@ -17,11 +17,11 @@ import java.lang.reflect.Method;
  */
 class InvocationWrapper extends Invocation {
 
-  private Interceptor[] inters;
+  private AopInterceptor[] inters;
   private Invocation invocation;
   private int index = 0;
 
-  InvocationWrapper(Invocation invocation, Interceptor[] inters) {
+  InvocationWrapper(Invocation invocation, AopInterceptor[] inters) {
     this.invocation = invocation;
     this.inters = inters;
   }

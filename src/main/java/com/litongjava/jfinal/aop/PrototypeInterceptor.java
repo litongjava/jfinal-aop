@@ -13,7 +13,7 @@ package com.litongjava.jfinal.aop;
 /**
  * PrototypeInterceptor.
  */
-public abstract class PrototypeInterceptor implements Interceptor {
+public abstract class PrototypeInterceptor implements AopInterceptor {
 
   final public void intercept(Invocation inv) {
     try {

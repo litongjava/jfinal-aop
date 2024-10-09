@@ -18,7 +18,7 @@ package com.litongjava.jfinal.proxy;
 
 import java.lang.reflect.Method;
 
-import com.litongjava.jfinal.aop.Interceptor;
+import com.litongjava.jfinal.aop.AopInterceptor;
 import com.litongjava.jfinal.aop.InterceptorManager;
 
 /**
@@ -37,7 +37,7 @@ public class ProxyMethod {
 	private Class<?> targetClass;
 	private Class<?> proxyClass;
 	private Method method;
-	private Interceptor[] interceptors = null;
+	private AopInterceptor[] interceptors = null;
 	
 	public void setKey(long key) {
 		this.key = key;
@@ -79,9 +79,9 @@ public class ProxyMethod {
 	 * 
 	 * 本方法仅在 Invocation 构造方法中调用
 	 */
-	public Interceptor[] getInterceptors() {
+	public AopInterceptor[] getInterceptors() {
 		if (interceptors == null) {
-			Interceptor[] ret = interMan.buildServiceMethodInterceptor(targetClass, method);
+			AopInterceptor[] ret = interMan.buildServiceMethodInterceptor(targetClass, method);
 			interceptors = ret;
 		}
 		return interceptors;

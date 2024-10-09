@@ -34,17 +34,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InterceptorManager {
 	
-	public static final Interceptor[] NULL_INTERS = new Interceptor[0];
+	public static final AopInterceptor[] NULL_INTERS = new AopInterceptor[0];
 	
 	// 控制层与业务层全局拦截器
-	private Interceptor[] globalActionInters = NULL_INTERS;
-	private Interceptor[] globalServiceInters = NULL_INTERS;
+	private AopInterceptor[] globalActionInters = NULL_INTERS;
+	private AopInterceptor[] globalServiceInters = NULL_INTERS;
 	
 	// 单例拦截器
-	private final ConcurrentHashMap<Class<? extends Interceptor>, Interceptor> singletonMap = new ConcurrentHashMap<Class<? extends Interceptor>, Interceptor>(32, 0.5F);
+	private final ConcurrentHashMap<Class<? extends AopInterceptor>, AopInterceptor> singletonMap = new ConcurrentHashMap<Class<? extends AopInterceptor>, AopInterceptor>(32, 0.5F);
 	
 	// 业务层 Class 级别拦截器缓存
-	private final ConcurrentHashMap<Class<?>, Interceptor[]> serviceClassInters = new ConcurrentHashMap<Class<?>, Interceptor[]>(32, 0.5F);
+	private final ConcurrentHashMap<Class<?>, AopInterceptor[]> serviceClassInters = new ConcurrentHashMap<Class<?>, AopInterceptor[]>(32, 0.5F);
 	
 	private static final InterceptorManager me = new InterceptorManager();
 	
@@ -56,8 +56,8 @@ public class InterceptorManager {
 	
 	
 	// 缓存业务层 Class 级拦截器
-	public Interceptor[] createServiceInterceptor(Class<?> serviceClass) {
-		Interceptor[] result = serviceClassInters.get(serviceClass);
+	public AopInterceptor[] createServiceInterceptor(Class<?> serviceClass) {
+		AopInterceptor[] result = serviceClassInters.get(serviceClass);
 		if (result == null) {
 			result = createInterceptor(serviceClass.getAnnotation(Before.class));
 			serviceClassInters.put(serviceClass, result);
@@ -65,14 +65,14 @@ public class InterceptorManager {
 		return result;
 	}
 	
-	public Interceptor[] buildServiceMethodInterceptor(Class<?> serviceClass, Method method) {
+	public AopInterceptor[] buildServiceMethodInterceptor(Class<?> serviceClass, Method method) {
 		return doBuild(globalServiceInters, NULL_INTERS, createServiceInterceptor(serviceClass), serviceClass, method);
 	}
 	
-	private Interceptor[] doBuild(Interceptor[] globalInters, Interceptor[] routesInters, Interceptor[] classInters, Class<?> targetClass, Method method) {
-		Interceptor[] methodInters = createInterceptor(method.getAnnotation(Before.class));
+	private AopInterceptor[] doBuild(AopInterceptor[] globalInters, AopInterceptor[] routesInters, AopInterceptor[] classInters, Class<?> targetClass, Method method) {
+		AopInterceptor[] methodInters = createInterceptor(method.getAnnotation(Before.class));
 		
-		Class<? extends Interceptor>[] clearIntersOnMethod;
+		Class<? extends AopInterceptor>[] clearIntersOnMethod;
 		Clear clearOnMethod = method.getAnnotation(Clear.class);
 		if (clearOnMethod != null) {
 			clearIntersOnMethod = clearOnMethod.value();
@@ -83,7 +83,7 @@ public class InterceptorManager {
 			clearIntersOnMethod = null;
 		}
 		
-		Class<? extends Interceptor>[] clearIntersOnClass;
+		Class<? extends AopInterceptor>[] clearIntersOnClass;
 		Clear clearOnClass = targetClass.getAnnotation(Clear.class);
 		if (clearOnClass != null) {
 			clearIntersOnClass = clearOnClass.value();
@@ -95,34 +95,34 @@ public class InterceptorManager {
 			clearIntersOnClass = null;
 		}
 		
-		ArrayList<Interceptor> result = new ArrayList<Interceptor>(globalInters.length + routesInters.length + classInters.length + methodInters.length);
-		for (Interceptor inter : globalInters) {
+		ArrayList<AopInterceptor> result = new ArrayList<AopInterceptor>(globalInters.length + routesInters.length + classInters.length + methodInters.length);
+		for (AopInterceptor inter : globalInters) {
 			result.add(inter);
 		}
-		for (Interceptor inter : routesInters) {
+		for (AopInterceptor inter : routesInters) {
 			result.add(inter);
 		}
 		if (clearIntersOnClass != null && clearIntersOnClass.length > 0) {
 			removeInterceptor(result, clearIntersOnClass);
 		}
-		for (Interceptor inter : classInters) {
+		for (AopInterceptor inter : classInters) {
 			result.add(inter);
 		}
 		if (clearIntersOnMethod != null && clearIntersOnMethod.length > 0) {
 			removeInterceptor(result, clearIntersOnMethod);
 		}
-		for (Interceptor inter : methodInters) {
+		for (AopInterceptor inter : methodInters) {
 			result.add(inter);
 		}
-		return result.toArray(new Interceptor[result.size()]);
+		return result.toArray(new AopInterceptor[result.size()]);
 	}
 	
-	private void removeInterceptor(ArrayList<Interceptor> target, Class<? extends Interceptor>[] clearInters) {
-		for (Iterator<Interceptor> it = target.iterator(); it.hasNext();) {
-			Interceptor curInter = it.next();
+	private void removeInterceptor(ArrayList<AopInterceptor> target, Class<? extends AopInterceptor>[] clearInters) {
+		for (Iterator<AopInterceptor> it = target.iterator(); it.hasNext();) {
+			AopInterceptor curInter = it.next();
 			if (curInter != null) {
-				Class<? extends Interceptor> curInterClass = curInter.getClass();
-				for (Class<? extends Interceptor> ci : clearInters) {
+				Class<? extends AopInterceptor> curInterClass = curInter.getClass();
+				for (Class<? extends AopInterceptor> ci : clearInters) {
 					if (curInterClass == ci) {
 						it.remove();
 						break;
@@ -134,25 +134,25 @@ public class InterceptorManager {
 		}
 	}
 	
-	public Interceptor[] createInterceptor(Before beforeAnnotation) {
+	public AopInterceptor[] createInterceptor(Before beforeAnnotation) {
 		if (beforeAnnotation == null) {
 			return NULL_INTERS;
 		}
 		return createInterceptor(beforeAnnotation.value());
 	}
 	
-	public Interceptor[] createInterceptor(Class<? extends Interceptor>[] interceptorClasses) {
+	public AopInterceptor[] createInterceptor(Class<? extends AopInterceptor>[] interceptorClasses) {
 		if (interceptorClasses == null || interceptorClasses.length == 0) {
 			return NULL_INTERS;
 		}
 		
-		Interceptor[] result = new Interceptor[interceptorClasses.length];
+		AopInterceptor[] result = new AopInterceptor[interceptorClasses.length];
 		try {
 			for (int i=0; i<result.length; i++) {
 				result[i] = singletonMap.get(interceptorClasses[i]);
 				if (result[i] == null) {
 					// 此处不能使用 Aop.get(...)，避免生成代理类
-					result[i] = (Interceptor)interceptorClasses[i].newInstance();
+					result[i] = (AopInterceptor)interceptorClasses[i].newInstance();
 					if (AopManager.me().isInjectDependency()) {
 						Aop.inject(result[i]);
 					}
@@ -165,20 +165,20 @@ public class InterceptorManager {
 		}
 	}
 	
-	public void addGlobalActionInterceptor(Interceptor... inters) {
+	public void addGlobalActionInterceptor(AopInterceptor... inters) {
 		addGlobalInterceptor(true, inters);
 	}
 	
-	public void addGlobalServiceInterceptor(Interceptor... inters) {
+	public void addGlobalServiceInterceptor(AopInterceptor... inters) {
 		addGlobalInterceptor(false, inters);
 	}
 	
-	private synchronized void addGlobalInterceptor(boolean forAction, Interceptor... inters) {
+	private synchronized void addGlobalInterceptor(boolean forAction, AopInterceptor... inters) {
 		if (inters == null || inters.length == 0) {
 			throw new IllegalArgumentException("interceptors can not be null.");
 		}
 		
-		for (Interceptor inter : inters) {
+		for (AopInterceptor inter : inters) {
 			if (inter == null) {
 				throw new IllegalArgumentException("interceptor can not be null.");
 			}
@@ -187,15 +187,15 @@ public class InterceptorManager {
 			}
 		}
 		
-		for (Interceptor inter : inters) {
+		for (AopInterceptor inter : inters) {
 			if (AopManager.me().isInjectDependency()) {
 				Aop.inject(inter);
 			}
 			singletonMap.put(inter.getClass(), inter);
 		}
 		
-		Interceptor[] globalInters = forAction ? globalActionInters : globalServiceInters;
-		Interceptor[] temp = new Interceptor[globalInters.length + inters.length];
+		AopInterceptor[] globalInters = forAction ? globalActionInters : globalServiceInters;
+		AopInterceptor[] temp = new AopInterceptor[globalInters.length + inters.length];
 		System.arraycopy(globalInters, 0, temp, 0, globalInters.length);
 		System.arraycopy(inters, 0, temp, globalInters.length, inters.length);
 		
@@ -208,7 +208,7 @@ public class InterceptorManager {
 	
 	public java.util.List<Class<?>> getGlobalServiceInterceptorClasses() {
 		ArrayList<Class<?>> ret = new ArrayList<>(globalServiceInters.length + 3);
-		for (Interceptor i : globalServiceInters) {
+		for (AopInterceptor i : globalServiceInters) {
 			ret.add(i.getClass());
 		}
 		return ret;

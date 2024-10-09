@@ -6,10 +6,10 @@ import java.util.List;
 /**
  * InterceptorStack.
  */
-public abstract class InterceptorStack implements Interceptor {
+public abstract class InterceptorStack implements AopInterceptor {
 
-  private Interceptor[] inters;
-  private List<Interceptor> interList;
+  private AopInterceptor[] inters;
+  private List<AopInterceptor> interList;
 
   public InterceptorStack() {
     config();
@@ -17,21 +17,21 @@ public abstract class InterceptorStack implements Interceptor {
     if (interList == null)
       throw new RuntimeException("You must invoke addInterceptors(...) to config your InterceptorStack");
 
-    inters = interList.toArray(new Interceptor[interList.size()]);
+    inters = interList.toArray(new AopInterceptor[interList.size()]);
     interList.clear();
     interList = null;
   }
 
-  protected InterceptorStack addInterceptors(Interceptor... interceptors) {
+  protected InterceptorStack addInterceptors(AopInterceptor... interceptors) {
     if (interceptors == null || interceptors.length == 0) {
       throw new IllegalArgumentException("Interceptors can not be null");
     }
 
     if (interList == null) {
-      interList = new ArrayList<Interceptor>();
+      interList = new ArrayList<AopInterceptor>();
     }
 
-    for (Interceptor ref : interceptors) {
+    for (AopInterceptor ref : interceptors) {
       if (AopManager.me().isInjectDependency()) {
         Aop.inject(ref);
       }
