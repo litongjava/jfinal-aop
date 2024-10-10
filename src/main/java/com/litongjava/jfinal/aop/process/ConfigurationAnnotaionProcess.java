@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import com.litongjava.annotation.ABean;
-import com.litongjava.annotation.AInitialization;
+import com.litongjava.annotation.Initialization;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.aop.AopManager;
 import com.litongjava.jfinal.model.DestroyableBean;
@@ -42,7 +42,7 @@ public class ConfigurationAnnotaionProcess {
         if (method.isAnnotationPresent(ABean.class)) {
           beanMethods.add(new Pair<>(method, clazz));
         }
-        if (method.isAnnotationPresent(AInitialization.class)) {
+        if (method.isAnnotationPresent(Initialization.class)) {
           initializationMethods.add(new Pair<>(method, clazz));
         }
       }
@@ -51,7 +51,7 @@ public class ConfigurationAnnotaionProcess {
     // 2. 按照priority对beanMethods排序
     beanMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(ABean.class).priority()));
     initializationMethods
-        .sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(AInitialization.class).priority()));
+        .sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(Initialization.class).priority()));
     Queue<Object> beans = new LinkedList<>();
     List<DestroyableBean> destroyableBeans = new ArrayList<>();
     // 3. 初始化beans
