@@ -36,7 +36,7 @@ public class ProxyClassTemplate {
            + "生成的源代码格式如下：\n"
            + "\n"
            + "package com.xxx;\n"
-           + "import com.litongjava.jfinal.aop.Invocation;\n"
+           + "import com.litongjava.jfinal.aop.AopInvocation;\n"
            + "\n"
            + "public class Target$$EnhancerByJFinal extends Target {\n"
            + "\tpublic String test(String p0, int p1) {\n"

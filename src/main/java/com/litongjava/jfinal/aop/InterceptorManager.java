@@ -59,7 +59,7 @@ public class InterceptorManager {
 	public AopInterceptor[] createServiceInterceptor(Class<?> serviceClass) {
 		AopInterceptor[] result = serviceClassInters.get(serviceClass);
 		if (result == null) {
-			result = createInterceptor(serviceClass.getAnnotation(Before.class));
+			result = createInterceptor(serviceClass.getAnnotation(AopBefore.class));
 			serviceClassInters.put(serviceClass, result);
 		}
 		return result;
@@ -70,10 +70,10 @@ public class InterceptorManager {
 	}
 	
 	private AopInterceptor[] doBuild(AopInterceptor[] globalInters, AopInterceptor[] routesInters, AopInterceptor[] classInters, Class<?> targetClass, Method method) {
-		AopInterceptor[] methodInters = createInterceptor(method.getAnnotation(Before.class));
+		AopInterceptor[] methodInters = createInterceptor(method.getAnnotation(AopBefore.class));
 		
 		Class<? extends AopInterceptor>[] clearIntersOnMethod;
-		Clear clearOnMethod = method.getAnnotation(Clear.class);
+		AopClear clearOnMethod = method.getAnnotation(AopClear.class);
 		if (clearOnMethod != null) {
 			clearIntersOnMethod = clearOnMethod.value();
 			if (clearIntersOnMethod.length == 0) {	// method 级 @Clear 且不带参
@@ -84,7 +84,7 @@ public class InterceptorManager {
 		}
 		
 		Class<? extends AopInterceptor>[] clearIntersOnClass;
-		Clear clearOnClass = targetClass.getAnnotation(Clear.class);
+		AopClear clearOnClass = targetClass.getAnnotation(AopClear.class);
 		if (clearOnClass != null) {
 			clearIntersOnClass = clearOnClass.value();
 			if (clearIntersOnClass.length == 0) {	// class 级 @clear 且不带参
@@ -134,7 +134,7 @@ public class InterceptorManager {
 		}
 	}
 	
-	public AopInterceptor[] createInterceptor(Before beforeAnnotation) {
+	public AopInterceptor[] createInterceptor(AopBefore beforeAnnotation) {
 		if (beforeAnnotation == null) {
 			return NULL_INTERS;
 		}

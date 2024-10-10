@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 import com.jfinal.kit.Kv;
 import com.jfinal.template.Engine;
 import com.jfinal.template.Template;
-import com.litongjava.jfinal.aop.Before;
-import com.litongjava.jfinal.aop.Clear;
+import com.litongjava.jfinal.aop.AopBefore;
+import com.litongjava.jfinal.aop.AopClear;
 import com.litongjava.jfinal.aop.InterceptorManager;
 
 import lombok.extern.slf4j.Slf4j;
@@ -322,7 +322,7 @@ public class ProxyGenerator {
     List<Class<?>> ret;
 
     // 结合 class 级 @Clear，得到 global 级拦截器
-    Clear clearOnClass = proxyClass.getTarget().getAnnotation(Clear.class);
+    AopClear clearOnClass = proxyClass.getTarget().getAnnotation(AopClear.class);
     if (clearOnClass != null) {
       Class<?>[] clearIntersOnClass = clearOnClass.value();
       if (clearIntersOnClass.length != 0) { // class 级 @clear 且带参
@@ -336,7 +336,7 @@ public class ProxyGenerator {
     }
 
     // 追加 class 级拦截器
-    Before beforeOnClass = proxyClass.getTarget().getAnnotation(Before.class);
+    AopBefore beforeOnClass = proxyClass.getTarget().getAnnotation(AopBefore.class);
     if (beforeOnClass != null) {
       Class<?>[] classInters = beforeOnClass.value();
       for (Class<?> c : classInters) {
@@ -372,14 +372,14 @@ public class ProxyGenerator {
    */
   protected boolean hasInterceptor(List<Class<?>> methodUpperInters, ProxyClass proxyClass, Method method) {
     // 如果 method 存在拦截器，可断定 hasInterceptor 为真，因为 @Clear 不能清除 method 级拦截器
-    Before beforeOnMethod = method.getAnnotation(Before.class);
+    AopBefore beforeOnMethod = method.getAnnotation(AopBefore.class);
     if (beforeOnMethod != null && beforeOnMethod.value().length != 0) {
       return true;
     }
 
     // method 级拦截器不存在的情况，只需考虑察 global、class 级拦截器结合 method 级 @Clear 的留存情况
     List<Class<?>> ret;
-    Clear clearOnMethod = method.getAnnotation(Clear.class);
+    AopClear clearOnMethod = method.getAnnotation(AopClear.class);
     if (clearOnMethod != null) {
       Class<?>[] clearIntersOnMethod = clearOnMethod.value();
       if (clearIntersOnMethod.length != 0) {
