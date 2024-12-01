@@ -1,4 +1,4 @@
-package com.litongjava.jfinal.aop.scaner;
+package com.litongjava.jfinal.aop.scanner;
 
 import java.io.File;
 import java.lang.annotation.Annotation;

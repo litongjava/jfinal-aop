@@ -97,6 +97,22 @@ public class AopFactory {
     }
   }
 
+  public <T> T getSingleton(Class<T> targetClass) {
+    try {
+      return doGetSingleton(targetClass, null);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  
+  public <T> T getPrototype(Class<T> targetClass) {
+    try {
+      return doGetPrototype(targetClass, null);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   protected <T> T doGetSingleton(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
 
@@ -145,7 +161,7 @@ public class AopFactory {
   protected <T> T doGetgetWithMapping(Class<T> targetClass, Map<Class<Object>, Class<? extends Object>> interfaceMapping) throws ReflectiveOperationException {
     // Aop.get(obj.getClass()) 可以用 Aop.inject(obj)，所以注掉下一行代码
     // targetClass = (Class<T>)getUsefulClass(targetClass);
-    
+
     if (enableWithSpring == null) {
       enableWithSpring = AopManager.me().getEnableWithSpring();
     }

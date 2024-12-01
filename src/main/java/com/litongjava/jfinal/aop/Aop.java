@@ -8,7 +8,7 @@ import com.litongjava.annotation.AConfiguration;
 import com.litongjava.jfinal.aop.process.BeanProcess;
 import com.litongjava.jfinal.aop.process.BeforeStartConfigurationProcess;
 import com.litongjava.jfinal.aop.process.ComponentAnnotation;
-import com.litongjava.jfinal.aop.scaner.ComponentScanner;
+import com.litongjava.jfinal.aop.scanner.ComponentScanner;
 import com.litongjava.jfinal.model.DestroyableBean;
 
 /**
@@ -88,6 +88,14 @@ public class Aop {
     return aopFactory.get(targetClass);
   }
 
+  public static <T> T getSingleton(Class<T> targetClass) {
+    return aopFactory.getSingleton(targetClass);
+  }
+
+  public static <T> T getPrototype(Class<T> targetClass) {
+    return aopFactory.getPrototype(targetClass);
+  }
+
   /**
    * 如果需要被注入的成员是一个接口类,从mapping中查找实现类,找到之后实例化实现类并将这个元素从mapping中移除
    * @param clazz
@@ -103,7 +111,9 @@ public class Aop {
   }
 
   /*
-   * 通过 AopManager.me().getAopFactory().inject(...) 可调用如下方法，不直接开放出来 public static <T> T inject(Class<T> targetClass, T targetObject) { return aopFactory.inject(targetClass, targetObject); }
+   * 通过 AopManager.me().getAopFactory().inject(...) 可调用如下方法，不直接开放出来 public static
+   * <T> T inject(Class<T> targetClass, T targetObject) { return
+   * aopFactory.inject(targetClass, targetObject); }
    */
 
   /**
@@ -140,7 +150,7 @@ public class Aop {
   }
 
   public static List<Class<?>> scan(Class<?>... primarySources) throws Exception {
-    return ComponentScanner.scan(primarySources,false);
+    return ComponentScanner.scan(primarySources, false);
   }
 
   public static void initAnnotation(List<Class<?>> scannedClasses) {
