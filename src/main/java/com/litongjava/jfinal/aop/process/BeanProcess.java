@@ -24,16 +24,12 @@ public class BeanProcess {
       return;
     }
     ConfigurationAnnotaionProcess configurationAnnotaionProcess = new ConfigurationAnnotaionProcess();
-    // for(int i=0;i<scannedClasses.size();i++) {
-    // log.info("{}",scannedClasses.get(i).toString());
-    // }
 
     // interface,impl
     Map<Class<Object>, Class<? extends Object>> mapping = new ConcurrentHashMap<>();
-    // 1. 分类为 Configuration类和其他类,先处理Configuration类
+
     for (Class<?> clazz : scannedClasses) {
       boolean annotationPresent = clazz.isAnnotationPresent(AConfiguration.class);
-      // log.info("{},{}",clazz.toString(),annotationPresent);
       if (annotationPresent) {
         configurationClass.add(clazz);
         continue;
@@ -47,27 +43,19 @@ public class BeanProcess {
       }
     }
 
-    MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration = configurationAnnotaionProcess
-        .processConfiguration(configurationClass, mapping);
-    // Queue<Object> beans = processConfiguration.getR1();
+    MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration = configurationAnnotaionProcess.processConfiguration(configurationClass, mapping);
+
     if (processConfiguration != null) {
       List<DestroyableBean> destroyableBeans = processConfiguration.getR2();
       Aop.addDestroyableBeans(destroyableBeans);
     }
 
-    // 处理autoWird注解,Aop框架已经内置改支持
-    // this.processAutowired(beans);
-
     // 处理componment注解
-    // Queue<Object> componentBeans = this.processComponent(componentClass);
     this.processComponent(componentClass, mapping);
-    //
-    // this.processAutowired(componentBeans);
 
   }
 
-  public Queue<Object> processComponent(Queue<Class<?>> componentClass,
-      Map<Class<Object>, Class<? extends Object>> mapping) {
+  public Queue<Object> processComponent(Queue<Class<?>> componentClass, Map<Class<Object>, Class<? extends Object>> mapping) {
     Queue<Object> componentBeans = new LinkedList<>();
     for (Class<?> clazz : componentClass) {
       Object object = Aop.get(clazz, mapping);

@@ -28,8 +28,7 @@ public class ConfigurationAnnotaionProcess {
    * @param mapping 
    * @return
    */
-  public MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(
-      Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
+  public MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
     // 边界处理
     if (configurationClass == null || configurationClass.size() < 1) {
       return null;
@@ -50,8 +49,7 @@ public class ConfigurationAnnotaionProcess {
 
     // 2. 按照priority对beanMethods排序
     beanMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(ABean.class).priority()));
-    initializationMethods
-        .sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(Initialization.class).priority()));
+    initializationMethods.sort(Comparator.comparingInt(m -> m.getKey().getAnnotation(Initialization.class).priority()));
     Queue<Object> beans = new LinkedList<>();
     List<DestroyableBean> destroyableBeans = new ArrayList<>();
     // 3. 初始化beans
@@ -150,18 +148,15 @@ public class ConfigurationAnnotaionProcess {
 
   }
 
-  public void processConfigInitialization(Class<?> clazz, Method method,
-      Map<Class<Object>, Class<? extends Object>> mapping) {
-    // 调用 @Bean 方法
+  public void processConfigInitialization(Class<?> clazz, Method method, Map<Class<Object>, Class<? extends Object>> mapping) {
     try {
-      // 添加到到bean容器
       method.invoke(Aop.get(clazz, mapping));
-      // method.invoke(Aop.get(clazz));
-    } catch (Exception e) {
-      log.error("error occured " + method.toString());
-      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    } catch (IllegalArgumentException e) {
+      throw new RuntimeException(e);
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(e);
     }
-
   }
-
 }
