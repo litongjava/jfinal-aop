@@ -10,7 +10,7 @@ import com.litongjava.annotation.AConfiguration;
 import com.litongjava.annotation.BeforeStartConfiguration;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.model.result.MultiReturn;
+import com.litongjava.model.result.MultiResult;
 
 public class BeforeStartConfigurationProcess {
 
@@ -51,7 +51,7 @@ public class BeforeStartConfigurationProcess {
       }
     }
 
-    MultiReturn<Queue<Object>, List<DestroyableBean>, Void> result = new ConfigurationAnnotaionProcess()
+    MultiResult<Queue<Object>, List<DestroyableBean>, Void> result = new ConfigurationAnnotaionProcess()
         .processConfiguration(beforeStartConfigurationClass, mapping);
     // 获取第二个返回结果
     if (result != null) {

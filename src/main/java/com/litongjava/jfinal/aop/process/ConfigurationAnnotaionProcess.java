@@ -14,7 +14,7 @@ import com.litongjava.annotation.Initialization;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.aop.AopManager;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.model.result.MultiReturn;
+import com.litongjava.model.result.MultiResult;
 import com.litongjava.model.result.Pair;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class ConfigurationAnnotaionProcess {
    * @param mapping 
    * @return
    */
-  public MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
+  public MultiResult<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
     // 边界处理
     if (configurationClass == null || configurationClass.size() < 1) {
       return null;
@@ -78,7 +78,7 @@ public class ConfigurationAnnotaionProcess {
       this.processConfigInitialization(beanMethod.getValue(), beanMethod.getKey(), mapping);
     }
     // 返回初始化的Bean和可以销毁的bean
-    return new MultiReturn<Queue<Object>, List<DestroyableBean>, Void>(true, beans, destroyableBeans);
+    return new MultiResult<Queue<Object>, List<DestroyableBean>, Void>(true, beans, destroyableBeans);
 
   }
 

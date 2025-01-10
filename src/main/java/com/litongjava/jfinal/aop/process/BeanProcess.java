@@ -11,7 +11,7 @@ import com.litongjava.annotation.AAutowired;
 import com.litongjava.annotation.AConfiguration;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.model.result.MultiReturn;
+import com.litongjava.model.result.MultiResult;
 
 public class BeanProcess {
   // 创建一个队列来存储 process 方法的返回值
@@ -43,7 +43,7 @@ public class BeanProcess {
       }
     }
 
-    MultiReturn<Queue<Object>, List<DestroyableBean>, Void> processConfiguration = configurationAnnotaionProcess.processConfiguration(configurationClass, mapping);
+    MultiResult<Queue<Object>, List<DestroyableBean>, Void> processConfiguration = configurationAnnotaionProcess.processConfiguration(configurationClass, mapping);
 
     if (processConfiguration != null) {
       List<DestroyableBean> destroyableBeans = processConfiguration.getR2();
