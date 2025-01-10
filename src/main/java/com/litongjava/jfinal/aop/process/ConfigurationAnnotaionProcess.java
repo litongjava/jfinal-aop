@@ -14,8 +14,8 @@ import com.litongjava.annotation.Initialization;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.aop.AopManager;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.jfinal.model.MultiReturn;
-import com.litongjava.jfinal.model.Pair;
+import com.litongjava.model.result.MultiReturn;
+import com.litongjava.model.result.Pair;
 
 import lombok.extern.slf4j.Slf4j;
 

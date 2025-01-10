@@ -10,7 +10,7 @@ import com.litongjava.annotation.AConfiguration;
 import com.litongjava.annotation.BeforeStartConfiguration;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.jfinal.model.MultiReturn;
+import com.litongjava.model.result.MultiReturn;
 
 public class BeforeStartConfigurationProcess {
 

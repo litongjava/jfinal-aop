@@ -11,7 +11,7 @@ import com.litongjava.annotation.AAutowired;
 import com.litongjava.annotation.AConfiguration;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.jfinal.model.MultiReturn;
+import com.litongjava.model.result.MultiReturn;
 
 public class BeanProcess {
   // 创建一个队列来存储 process 方法的返回值
