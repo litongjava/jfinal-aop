@@ -15,9 +15,12 @@ import com.litongjava.jfinal.proxy.Proxy;
 import com.litongjava.jfinal.proxy.ProxyMethodCache;
 import com.litongjava.jfinal.spring.SpringBeanContextUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * AopFactory 是工具类 Aop 功能的具体实现，详细用法见 Aop
  */
+@Slf4j
 public class AopFactory {
 
   // 单例缓存
@@ -522,10 +525,10 @@ public class AopFactory {
 
     if (mapping == null) {
       mapping = new HashMap<Class<?>, Class<?>>(128, 0.25F);
-    } 
-//    else if (mapping.containsKey(from)) {
-//      throw new RuntimeException("Class already mapped : " + from.getName());
-//    }
+    } else if (mapping.containsKey(from)) {
+      //throw new RuntimeException("Class already mapped : " + from.getName());
+      log.warn("Class already mapped : " + from.getName());
+    }
 
     mapping.put(from, to);
     return this;
