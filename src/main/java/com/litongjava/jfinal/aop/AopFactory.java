@@ -104,7 +104,7 @@ public class AopFactory {
       throw new RuntimeException(e);
     }
   }
-  
+
   public <T> T getPrototype(Class<T> targetClass) {
     try {
       return doGetPrototype(targetClass, null);
@@ -114,28 +114,27 @@ public class AopFactory {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T doGetSingleton(Class<T> targetClass, Class<?> intrefaceClass) throws ReflectiveOperationException {
-
-    Object ret = singletonCache.get(targetClass);
-    if (ret != null) {
-      return (T) ret;
+  protected <T> T doGetSingleton(Class<T> targetClass, Class<?> interfaceClass) throws ReflectiveOperationException {
+    // 1 singletonCache
+    Object existing = singletonCache.get(targetClass);
+    if (existing != null) {
+      return (T) existing;
     }
 
+    // 2️ 缓存里没有，再走原来的创建+映射逻辑
     HashMap<Class<?>, Object> map = singletonTl.get();
     int size = map.size();
-    if (size > 0) {
-      ret = map.get(targetClass);
-      if (ret != null) { // 发现循环注入
-        return (T) ret;
-      }
+    Object ret = map.get(targetClass);
+    if (ret != null) {
+      return (T) ret;
     }
 
     synchronized (this) {
       try {
         ret = singletonCache.get(targetClass);
         if (ret == null) {
-          if (intrefaceClass != null) {
-            ret = createObject(targetClass, intrefaceClass);
+          if (interfaceClass != null) {
+            ret = createObject(targetClass, interfaceClass);
           } else {
             ret = createObject(targetClass);
           }
@@ -145,11 +144,10 @@ public class AopFactory {
         singletonCache.put(targetClass, ret);
         return (T) ret;
       } finally {
-        if (size == 0) { // 仅顶层才需要 remove()
+        if (size == 0) {
           singletonTl.remove();
         }
       }
-
     }
   }
 
@@ -524,9 +522,10 @@ public class AopFactory {
 
     if (mapping == null) {
       mapping = new HashMap<Class<?>, Class<?>>(128, 0.25F);
-    } else if (mapping.containsKey(from)) {
-      throw new RuntimeException("Class already mapped : " + from.getName());
-    }
+    } 
+//    else if (mapping.containsKey(from)) {
+//      throw new RuntimeException("Class already mapped : " + from.getName());
+//    }
 
     mapping.put(from, to);
     return this;
