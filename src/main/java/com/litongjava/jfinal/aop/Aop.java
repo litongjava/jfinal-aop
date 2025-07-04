@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.litongjava.annotation.AConfiguration;
+import com.litongjava.jfinal.aop.context.AopContext;
 import com.litongjava.jfinal.aop.process.BeanProcess;
 import com.litongjava.jfinal.aop.process.BeforeStartConfigurationProcess;
 import com.litongjava.jfinal.aop.process.ComponentAnnotation;
 import com.litongjava.jfinal.aop.scanner.ComponentScanner;
+import com.litongjava.jfinal.aop.scanner.DefaultComponentScanner;
 import com.litongjava.jfinal.model.DestroyableBean;
 
 /**
@@ -150,7 +152,12 @@ public class Aop {
   }
 
   public static List<Class<?>> scan(Class<?>... primarySources) throws Exception {
-    return ComponentScanner.scan(primarySources, false);
+    ComponentScanner componentScanner = AopContext.me().getComponentScanner();
+    if (componentScanner != null) {
+      return componentScanner.scan(primarySources, false);
+    } else {
+      return new DefaultComponentScanner().scan(primarySources, false);
+    }
   }
 
   public static void initAnnotation(List<Class<?>> scannedClasses) {
