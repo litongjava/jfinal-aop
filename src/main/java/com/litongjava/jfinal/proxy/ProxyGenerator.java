@@ -1,5 +1,6 @@
 package com.litongjava.jfinal.proxy;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -15,8 +16,10 @@ import java.util.stream.Collectors;
 import com.jfinal.kit.Kv;
 import com.jfinal.template.Engine;
 import com.jfinal.template.Template;
+import com.litongjava.jfinal.aop.AnnotationInterceptorRegistry;
 import com.litongjava.jfinal.aop.AopBefore;
 import com.litongjava.jfinal.aop.AopClear;
+import com.litongjava.jfinal.aop.AopInterceptor;
 import com.litongjava.jfinal.aop.InterceptorManager;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +29,11 @@ import lombok.extern.slf4j.Slf4j;
  *
  * 注意：业务层全局拦截器要在 ProxyGenerator 工作之前配置好，否则无法参与生成
  *
- * 追求性能极致：
- * 1：禁止使用 JDK 的 Method.invoke(...) 调用被代理方法
- * 2：method 存在有效的拦截器才生成代理方法 ProxyMethod
- * 3：目标类 target 存在 ProxyMethod 才生成代理类 ProxyClass
+ * 追求性能极致： 1：禁止使用 JDK 的 Method.invoke(...) 调用被代理方法 2：method 存在有效的拦截器才生成代理方法
+ * ProxyMethod 3：目标类 target 存在 ProxyMethod 才生成代理类 ProxyClass
  *
- * 避免生成代理类的方法：
- * 1：类文件内部删掉 @Before 声明的拦截器
- * 2：添加一个 class 层的 @Clear 注解
- * 因此，proxy 模块设计可以覆盖掉 @Enhance 注解功能
+ * 避免生成代理类的方法： 1：类文件内部删掉 @Before 声明的拦截器 2：添加一个 class 层的 @Clear 注解 因此，proxy
+ * 模块设计可以覆盖掉 @Enhance 注解功能
  */
 @Slf4j
 public class ProxyGenerator {
@@ -197,8 +196,7 @@ public class ProxyGenerator {
   }
 
   /**
-   * 方法返回值为 int[] 时 method.getReturnType().getName() 返回值为: [I
-   * 需要识别并转化
+   * 方法返回值为 int[] 时 method.getReturnType().getName() 返回值为: [I 需要识别并转化
    */
   protected String getReturnType(Method method) {
     // return method.getReturnType().getName();
@@ -291,10 +289,7 @@ public class ProxyGenerator {
   }
 
   /**
-   * 跳过不能代理的方法
-   * 1：非 public
-   * 2：final、static、abstract
-   * 3：方法名为：toString、hashCode、equals
+   * 跳过不能代理的方法 1：非 public 2：final、static、abstract 3：方法名为：toString、hashCode、equals
    */
   protected boolean isSkipMethod(Method method) {
     int mod = method.getModifiers();
@@ -315,8 +310,8 @@ public class ProxyGenerator {
   }
 
   /**
-   * 获取 method 上层的拦截器，也即获取 global、class 这两层拦截器
-   * 注意：global 层拦截器已结合 class 层 @Clear 注解处理过
+   * 获取 method 上层的拦截器，也即获取 global、class 这两层拦截器 注意：global 层拦截器已结合 class 层 @Clear
+   * 注解处理过
    */
   protected List<Class<?>> getMethodUpperInterceptors(ProxyClass proxyClass) {
     List<Class<?>> ret;
@@ -335,6 +330,16 @@ public class ProxyGenerator {
       ret = InterceptorManager.me().getGlobalServiceInterceptorClasses();
     }
 
+    // 插入从 registry 读取 class 上的映射拦截器
+    AnnotationInterceptorRegistry reg = InterceptorManager.me().getAnnotationRegistry();
+    if (!reg.keys().isEmpty()) {
+      for (Annotation ann : proxyClass.getTarget().getAnnotations()) {
+        List<Class<? extends AopInterceptor>> mapped = reg.get(ann.annotationType());
+        if (mapped != null && !mapped.isEmpty()) {
+          ret.addAll(mapped);
+        }
+      }
+    }
     // 追加 class 级拦截器
     AopBefore beforeOnClass = proxyClass.getTarget().getAnnotation(AopBefore.class);
     if (beforeOnClass != null) {
@@ -364,14 +369,16 @@ public class ProxyGenerator {
   }
 
   /**
-   * 当前 method 是否存在有效拦截器
-   * 1：如果存在 method 级拦截器，则 return true
-   * 2：否则结合 method 级的 @Clear 考察 global、class 两层拦截器的留存
-   *    global、class 两层拦截器已作为参数 methodUpperInters 被传入
-   *    methodUpperInters 中的拦截器已结合 class 级 @Clear 处理过
+   * 当前 method 是否存在有效拦截器 1：如果存在 method 级拦截器，则 return true 2：否则结合 method 级的 @Clear
+   * 考察 global、class 两层拦截器的留存 global、class 两层拦截器已作为参数 methodUpperInters 被传入
+   * methodUpperInters 中的拦截器已结合 class 级 @AopClear 处理过
    */
   protected boolean hasInterceptor(List<Class<?>> methodUpperInters, ProxyClass proxyClass, Method method) {
-    // 如果 method 存在拦截器，可断定 hasInterceptor 为真，因为 @Clear 不能清除 method 级拦截器
+    // method 上存在映射拦截器 => 一定要生成代理方法（@AopClear 不清 method 级拦截器）
+    if (hasMappedInterceptor(method)) {
+      return true;
+    }
+
     AopBefore beforeOnMethod = method.getAnnotation(AopBefore.class);
     if (beforeOnMethod != null && beforeOnMethod.value().length != 0) {
       return true;
@@ -416,6 +423,21 @@ public class ProxyGenerator {
    */
   public void setPrintGeneratedClassToLog(boolean printGeneratedClassToLog) {
     this.printGeneratedClassToLog = printGeneratedClassToLog;
+  }
+
+  protected boolean hasMappedInterceptor(java.lang.reflect.AnnotatedElement element) {
+    AnnotationInterceptorRegistry reg = InterceptorManager.me().getAnnotationRegistry();
+    // 快速路径：没注册任何 mapping
+    if (reg.keys().isEmpty()) {
+      return false;
+    }
+
+    for (java.lang.annotation.Annotation ann : element.getAnnotations()) {
+      if (reg.contains(ann.annotationType())) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }
