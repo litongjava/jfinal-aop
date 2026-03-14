@@ -3,7 +3,7 @@ package com.litongjava.jfinal.proxy;
 import java.lang.reflect.Method;
 
 import com.litongjava.jfinal.aop.AopInterceptor;
-import com.litongjava.jfinal.aop.InterceptorManager;
+import com.litongjava.jfinal.aop.AopInterceptorManager;
 
 /**
  * ProxyMethod
@@ -14,7 +14,7 @@ import com.litongjava.jfinal.aop.InterceptorManager;
  */
 public class ProxyMethod {
 
-  static final InterceptorManager interMan = InterceptorManager.me();
+  static final AopInterceptorManager interMan = AopInterceptorManager.me();
 
   private Long key;
 

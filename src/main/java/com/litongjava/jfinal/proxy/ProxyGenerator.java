@@ -20,7 +20,7 @@ import com.litongjava.jfinal.aop.AnnotationInterceptorRegistry;
 import com.litongjava.jfinal.aop.AopBefore;
 import com.litongjava.jfinal.aop.AopClear;
 import com.litongjava.jfinal.aop.AopInterceptor;
-import com.litongjava.jfinal.aop.InterceptorManager;
+import com.litongjava.jfinal.aop.AopInterceptorManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -321,17 +321,17 @@ public class ProxyGenerator {
     if (clearOnClass != null) {
       Class<?>[] clearIntersOnClass = clearOnClass.value();
       if (clearIntersOnClass.length != 0) { // class 级 @clear 且带参
-        ret = InterceptorManager.me().getGlobalServiceInterceptorClasses();
+        ret = AopInterceptorManager.me().getGlobalServiceInterceptorClasses();
         removeInterceptor(ret, clearIntersOnClass);
       } else {
         ret = new ArrayList<>(3);
       }
     } else {
-      ret = InterceptorManager.me().getGlobalServiceInterceptorClasses();
+      ret = AopInterceptorManager.me().getGlobalServiceInterceptorClasses();
     }
 
     // 插入从 registry 读取 class 上的映射拦截器
-    AnnotationInterceptorRegistry reg = InterceptorManager.me().getAnnotationRegistry();
+    AnnotationInterceptorRegistry reg = AopInterceptorManager.me().getAnnotationRegistry();
     if (!reg.keys().isEmpty()) {
       for (Annotation ann : proxyClass.getTarget().getAnnotations()) {
         List<Class<? extends AopInterceptor>> mapped = reg.get(ann.annotationType());
@@ -426,7 +426,7 @@ public class ProxyGenerator {
   }
 
   protected boolean hasMappedInterceptor(java.lang.reflect.AnnotatedElement element) {
-    AnnotationInterceptorRegistry reg = InterceptorManager.me().getAnnotationRegistry();
+    AnnotationInterceptorRegistry reg = AopInterceptorManager.me().getAnnotationRegistry();
     // 快速路径：没注册任何 mapping
     if (reg.keys().isEmpty()) {
       return false;

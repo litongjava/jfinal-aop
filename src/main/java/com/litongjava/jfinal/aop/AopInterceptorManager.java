@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 无法使用 Method 或 Before 对象缓存业务层 Method 级拦截器： 1：不同对象或相同对象获取同一个 Class 中同一个 Method
  * 得到的对象 id 值不相同 2：不同对象获取同一个 method 之上的 Before 得到的对象 id 值不相同
  */
-public class InterceptorManager {
+public class AopInterceptorManager {
 
   public static final AopInterceptor[] NULL_INTERS = new AopInterceptor[0];
 
@@ -49,12 +49,12 @@ public class InterceptorManager {
 
   private final AnnotationInterceptorRegistry annotationRegistry = new AnnotationInterceptorRegistry();
 
-  private static final InterceptorManager me = new InterceptorManager();
+  private static final AopInterceptorManager me = new AopInterceptorManager();
 
-  private InterceptorManager() {
+  private AopInterceptorManager() {
   }
 
-  public static InterceptorManager me() {
+  public static AopInterceptorManager me() {
     return me;
   }
 
@@ -172,6 +172,7 @@ public class InterceptorManager {
     return createInterceptor(beforeAnnotation.value());
   }
 
+  @SuppressWarnings("deprecation")
   public AopInterceptor[] createInterceptor(Class<? extends AopInterceptor>[] interceptorClasses) {
     if (interceptorClasses == null || interceptorClasses.length == 0) {
       return NULL_INTERS;
