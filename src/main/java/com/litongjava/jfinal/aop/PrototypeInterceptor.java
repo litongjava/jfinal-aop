@@ -15,6 +15,7 @@ package com.litongjava.jfinal.aop;
  */
 public abstract class PrototypeInterceptor implements AopInterceptor {
 
+  @SuppressWarnings("deprecation")
   final public void intercept(AopInvocation inv) {
     try {
       getClass().newInstance().doIntercept(inv);
