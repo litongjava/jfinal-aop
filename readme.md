@@ -13,11 +13,11 @@ jfinal-aop 是一个基于 JVM 的高性能 AOP 框架，源自 JFinal AOP 模�
 
 该包已发布到 Maven Central：
 
-https://central.sonatype.com/artifact/com.litongjava/jfinal-aop
+https://central.sonatype.com/artifact/nexus.io/jfinal-aop
 
 ```xml
 <dependency>
-  <groupId>com.litongjava</groupId>
+  <groupId>nexus.io</groupId>
   <artifactId>jfinal-aop</artifactId>
   <version>1.3.8</version>
 </dependency>
@@ -34,7 +34,7 @@ jfinal-aop 推荐通过 `Aop.get()` 创建对象，而不是直接使用 `new`�
 这样框架才能为对象生成代理并启用拦截器。
 
 ```java
-package com.litongjava.jfinal.aop;
+package nexus.io.jfinal.aop;
 
 import org.junit.Test;
 
@@ -59,7 +59,7 @@ public class AopTest {
 ```java
 package com.issues01;
 
-import com.litongjava.jfinal.aop.AopBefore;
+import nexus.io.jfinal.aop.AopBefore;
 
 public class Cat {
 
@@ -86,8 +86,8 @@ public class Cat {
 ```java
 package com.issues01;
 
-import com.litongjava.jfinal.aop.AopInterceptor;
-import com.litongjava.jfinal.aop.AopInvocation;
+import nexus.io.jfinal.aop.AopInterceptor;
+import nexus.io.jfinal.aop.AopInvocation;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
@@ -129,7 +129,7 @@ public class Aspect1 implements AopInterceptor {
 ```java
 package com.issues01;
 
-import com.litongjava.jfinal.aop.Aop;
+import nexus.io.jfinal.aop.Aop;
 
 public class CatMainTest {
 
@@ -160,7 +160,7 @@ Generate proxy class "com.issues01.Cat$$EnhancerByJFinal":
 
 package com.issues01;
 
-import com.litongjava.jfinal.aop.AopInvocation;
+import nexus.io.jfinal.aop.AopInvocation;
 
 public class Cat$$EnhancerByJFinal extends Cat {
 
@@ -220,7 +220,7 @@ public interface DemoService {
 ```java
 package com.issues02;
 
-import com.litongjava.jfinal.aop.annotation.Service;
+import nexus.io.jfinal.aop.annotation.Service;
 
 @Service
 public class DemoServiceImpl implements DemoService {
@@ -238,8 +238,8 @@ public class DemoServiceImpl implements DemoService {
 ```java
 package com.issues02;
 
-import com.litongjava.jfinal.aop.Autowired;
-import com.litongjava.jfinal.aop.annotation.Controller;
+import nexus.io.jfinal.aop.Autowired;
+import nexus.io.jfinal.aop.annotation.Controller;
 
 @Controller
 public class DemoController {
@@ -260,7 +260,7 @@ public class DemoController {
 ```java
 package com.issues02;
 
-import com.litongjava.jfinal.aop.Aop;
+import nexus.io.jfinal.aop.Aop;
 
 import java.util.List;
 
@@ -333,9 +333,9 @@ public @interface ATransactional {
 ```java
 package demo.jooq.tx;
 
-import com.litongjava.jfinal.aop.Aop;
-import com.litongjava.jfinal.aop.AopInterceptor;
-import com.litongjava.jfinal.aop.AopInvocation;
+import nexus.io.jfinal.aop.Aop;
+import nexus.io.jfinal.aop.AopInterceptor;
+import nexus.io.jfinal.aop.AopInvocation;
 
 public class TransactionInterceptor implements AopInterceptor {
 
@@ -360,8 +360,8 @@ public class TransactionInterceptor implements AopInterceptor {
 ```java
 package demo.jooq.config;
 
-import com.litongjava.context.BootConfiguration;
-import com.litongjava.jfinal.aop.AopInterceptorManager;
+import nexus.io.context.BootConfiguration;
+import nexus.io.jfinal.aop.AopInterceptorManager;
 
 import demo.jooq.tx.ATransactional;
 import demo.jooq.tx.TransactionInterceptor;
