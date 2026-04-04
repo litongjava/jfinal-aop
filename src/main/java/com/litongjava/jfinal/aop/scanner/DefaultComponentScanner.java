@@ -14,13 +14,12 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
-import com.litongjava.annotation.AComponentScan;
-import com.litongjava.annotation.AComponentScan.Filter;
-
 import lombok.extern.slf4j.Slf4j;
+import nexus.io.annotation.AComponentScan;
+import nexus.io.annotation.AComponentScan.Filter;
 
 @Slf4j
-public class DefaultComponentScanner {
+public class DefaultComponentScanner implements ComponentScanner {
 
   public List<Class<?>> scan(Class<?>[] primarySources, boolean printScannedClasses) throws Exception {
     List<Class<?>> classes = new ArrayList<>();

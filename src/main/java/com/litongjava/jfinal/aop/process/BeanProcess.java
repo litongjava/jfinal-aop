@@ -7,11 +7,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.litongjava.annotation.AAutowired;
-import com.litongjava.annotation.AConfiguration;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.model.result.MultiResult;
+
+import nexus.io.annotation.AAutowired;
+import nexus.io.annotation.AConfiguration;
+import nexus.io.model.result.MultiResult;
 
 public class BeanProcess {
   // 创建一个队列来存储 process 方法的返回值

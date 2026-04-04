@@ -4,11 +4,11 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.litongjava.annotation.AComponent;
-import com.litongjava.annotation.AController;
-import com.litongjava.annotation.AHttpApi;
-import com.litongjava.annotation.ARepository;
-import com.litongjava.annotation.AService;
+import nexus.io.annotation.AComponent;
+import nexus.io.annotation.AController;
+import nexus.io.annotation.AHttpApi;
+import nexus.io.annotation.ARepository;
+import nexus.io.annotation.AService;
 
 /**
  * 允许外部类添加组件注解

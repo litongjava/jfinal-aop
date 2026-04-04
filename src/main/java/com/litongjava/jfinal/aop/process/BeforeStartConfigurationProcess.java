@@ -6,11 +6,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.litongjava.annotation.AConfiguration;
-import com.litongjava.annotation.BeforeStartConfiguration;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.model.result.MultiResult;
+
+import nexus.io.annotation.AConfiguration;
+import nexus.io.annotation.BeforeStartConfiguration;
+import nexus.io.model.result.MultiResult;
 
 public class BeforeStartConfigurationProcess {
 

@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import com.litongjava.annotation.ABean;
-import com.litongjava.annotation.Initialization;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.aop.AopManager;
 import com.litongjava.jfinal.model.DestroyableBean;
-import com.litongjava.model.result.MultiResult;
-import com.litongjava.model.result.Pair;
 
 import lombok.extern.slf4j.Slf4j;
+import nexus.io.annotation.ABean;
+import nexus.io.annotation.Initialization;
+import nexus.io.model.result.MultiResult;
+import nexus.io.model.result.Pair;
 
 @Slf4j
 public class ConfigurationAnnotaionProcess {

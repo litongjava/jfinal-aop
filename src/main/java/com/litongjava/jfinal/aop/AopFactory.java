@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.litongjava.annotation.Inject;
 import com.litongjava.jfinal.model.DestroyableBean;
 import com.litongjava.jfinal.proxy.Proxy;
 import com.litongjava.jfinal.proxy.ProxyMethodCache;
 import com.litongjava.jfinal.spring.SpringBeanContextUtils;
 
 import lombok.extern.slf4j.Slf4j;
+import nexus.io.annotation.Inject;
 
 /**
  * AopFactory 是工具类 Aop 功能的具体实现，详细用法见 Aop
