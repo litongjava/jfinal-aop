@@ -2,7 +2,7 @@ package nexus.io.jfinal.aop;
 
 import org.junit.Test;
 
-import nexus.iojfinal.aop.Aop;
+import nexus.io.jfinal.aop.Aop;
 
 public class AopTest {
 

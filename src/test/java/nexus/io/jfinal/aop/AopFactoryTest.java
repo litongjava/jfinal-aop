@@ -2,8 +2,8 @@ package nexus.io.jfinal.aop;
 
 import org.junit.Test;
 
+import nexus.io.jfinal.aop.AopManager;
 import nexus.io.services.AppleService;
-import nexus.iojfinal.aop.AopManager;
 
 public class AopFactoryTest {
 
