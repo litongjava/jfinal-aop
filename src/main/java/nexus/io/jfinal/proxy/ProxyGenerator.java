@@ -45,7 +45,7 @@ public class ProxyGenerator {
   protected boolean printGeneratedClassToLog = true;
 
   public ProxyGenerator() {
-    String filename = "com/litongjava/jfinal/proxy/proxy_class_template.jf";
+    String filename = "nexus/io/jfinal/proxy/proxy_class_template.jf";
     engine = new Engine("forProxy").setToClassPathSourceFactory();
     String baseTemplatePath = engine.getEngineConfig().getBaseTemplatePath();
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
