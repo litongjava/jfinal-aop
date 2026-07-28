@@ -23,11 +23,13 @@ public class ConfigurationAnnotaionProcess {
 
   /**
    * 处理有和@Configuration注解类相似的逻辑
+   * 
    * @param configurationClass
-   * @param mapping 
+   * @param mapping
    * @return
    */
-  public MultiResult<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
+  public MultiResult<Queue<Object>, List<DestroyableBean>, Void> processConfiguration(
+      Queue<Class<?>> configurationClass, Map<Class<Object>, Class<? extends Object>> mapping) {
     // 边界处理
     if (configurationClass == null || configurationClass.size() < 1) {
       return null;
@@ -83,9 +85,10 @@ public class ConfigurationAnnotaionProcess {
 
   /**
    * 处理有@Bean注解的方法
+   * 
    * @param clazz
    * @param method
-   * @param mapping 
+   * @param mapping
    * @return
    */
   public Object processConfigBean(Class<?> clazz, Method method, Map<Class<Object>, Class<? extends Object>> mapping) {
@@ -147,14 +150,19 @@ public class ConfigurationAnnotaionProcess {
 
   }
 
-  public void processConfigInitialization(Class<?> clazz, Method method, Map<Class<Object>, Class<? extends Object>> mapping) {
+  public void processConfigInitialization(Class<?> clazz, Method method,
+      Map<Class<Object>, Class<? extends Object>> mapping) {
     try {
-      method.invoke(Aop.get(clazz, mapping));
+      Object object = Aop.get(clazz, mapping);
+      method.invoke(object);
     } catch (IllegalAccessException e) {
+      log.error("Failed to invode:{},{},{}", clazz, method);
       throw new RuntimeException(e);
     } catch (IllegalArgumentException e) {
+      log.error("Failed to invode:{},{},{}", clazz, method);
       throw new RuntimeException(e);
     } catch (InvocationTargetException e) {
+      log.error("Failed to invode:{},{},{}", clazz, method);
       throw new RuntimeException(e);
     }
   }

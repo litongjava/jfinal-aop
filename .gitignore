@@ -151,3 +151,4 @@ cmake-build-debug-mingw/
 venv/
 .vs/
 Debug/
+push.txt
